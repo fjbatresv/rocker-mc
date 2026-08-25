@@ -1,6 +1,6 @@
 # Rockers 502 MG Guatemala — sitio institucional
 
-Sitio estático de una sola página. Sin framework, sin backend y sin paso de compilación obligatorio: HTML, un CSS y un JavaScript de unas 150 líneas. Vive en un bucket de S3 detrás de CloudFront, con dos entornos: un push a `main` publica en dev, y producción se lanza a mano.
+Sitio estático de una sola página. Sin framework, sin backend y sin paso de compilación obligatorio: HTML, un CSS y un JavaScript de unas 150 líneas. Vive en un bucket de S3 detrás de CloudFront, con dos entornos: un push a `main` publica en dev y luego deja producción esperando aprobación del Environment `produccion`.
 
 ---
 
@@ -51,7 +51,7 @@ php -S localhost:8080 -t site
 │           ├── rodadas/             ocho fotos del carrusel
 │           └── maquinas/            cinco fotos del mosaico de estilos
 ├── .github/
-│   ├── workflows/deploy.yml     ← orquesta: dev automático, prod a mano
+│   ├── workflows/deploy.yml     ← orquesta: dev automático, prod tras aprobación
 │   ├── workflows/publicar.yml   ← workflow reutilizable, uno por entorno
 │   └── scripts/verificar_enlaces.py
 ├── infra/                       ← rol de IAM para el despliegue (OIDC)
@@ -95,17 +95,17 @@ El script separa el fondo con un relleno por inundación desde los bordes en lug
 
 | | dev | producción |
 |---|---|---|
-| Se dispara | automático, en cada push a `main` que toque `site/**` | a mano: **Actions → Desplegar → Run workflow** |
+| Se dispara | automático, en cada push a `main` que toque `site/**` | automático después de dev, pausado por reviewers del Environment |
 | Buscadores | bloqueado (`robots.txt` con `Disallow: /`, sin sitemap) | indexable |
 | Para qué | ver el sitio real antes de exponerlo | el sitio del club |
 
-Un merge a `main` publica en dev y ahí se queda. Producción se lanza cuando alguien decide lanzarlo, eligiendo `produccion` en el desplegable. También se puede relanzar dev a mano desde el mismo menú.
+Un merge a `main` publica en dev. Si ese despliegue termina bien, GitHub crea el job de producción y lo deja esperando la aprobación configurada en el Environment `produccion`. También se puede relanzar desde **Actions → Desplegar → Run workflow**: elegir `dev` solo publica dev; elegir `produccion` publica dev primero y luego producción.
 
 Ambos pasan primero por el job `verificar`, que comprueba que los cuatro archivos críticos existan y que ninguna referencia local del HTML apunte a un archivo inexistente.
 
 ```
-push a main ──→ verificar ──→ dev
-Run workflow ──→ verificar ──→ dev  o  producción  (según se elija)
+push a main ──→ verificar ──→ dev ──→ producción (requiere aprobación)
+Run workflow ──→ verificar ──→ dev ──→ producción si se eligió producción
 ```
 
 ### Por qué dos archivos de workflow

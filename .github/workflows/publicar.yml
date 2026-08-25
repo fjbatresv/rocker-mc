@@ -26,6 +26,11 @@ jobs:
     environment:
       name: ${{ inputs.entorno }}
       url: ${{ vars.SITE_URL }}
+    # Un despliegue a la vez por entorno. No se cancela el que está en curso:
+    # cortarlo a medias dejaría el bucket sincronizado a medias.
+    concurrency:
+      group: desplegar-${{ inputs.entorno }}
+      cancel-in-progress: false
 
     steps:
       - name: Descargar el repositorio
