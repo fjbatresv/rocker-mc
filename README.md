@@ -52,7 +52,6 @@ php -S localhost:8080 -t site
 │           └── maquinas/            cinco fotos del mosaico de estilos
 ├── .github/
 │   ├── workflows/deploy.yml     ← orquesta: dev automático, prod tras aprobación
-│   ├── workflows/publicar.yml   ← workflow reutilizable, uno por entorno
 │   └── scripts/verificar_enlaces.py
 ├── infra/                       ← rol de IAM para el despliegue (OIDC)
 │   ├── oidc-trust-policy.json
@@ -108,9 +107,9 @@ push a main ──→ verificar ──→ dev ──→ producción (requiere ap
 Run workflow ──→ verificar ──→ dev ──→ producción si se eligió producción
 ```
 
-### Por qué dos archivos de workflow
+### Por qué un solo workflow
 
-`deploy.yml` decide *cuándo* y *dónde*; `publicar.yml` es un workflow reutilizable con la secuencia de publicación, y se invoca una vez por entorno. La alternativa —copiar los mismos ocho pasos dos veces— garantiza que tarde o temprano se arreglen en uno y no en el otro.
+`deploy.yml` contiene toda la secuencia. Producción no se dispara desde un workflow separado: es un job dentro del mismo grafo con `needs: dev`. Eso deja explícita la regla operativa importante: nada llega a producción si antes no terminó el despliegue a dev.
 
 **Nada específico de un entorno vive en el código.** La región, la URL, el bucket, el rol y la distribución salen del Environment de GitHub. Cambiar de cuenta de AWS o de región no toca el repositorio.
 
