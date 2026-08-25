@@ -18,7 +18,7 @@ Un rol por entorno:
 
 ```bash
 cd infra
-./crear-rol.sh produccion rockers502-gt-site E1XXXXXXXXXXXX
+./crear-rol.sh prod      rockers502-gt-site E1XXXXXXXXXXXX
 ./crear-rol.sh dev        rockers502-gt-dev  E2YYYYYYYYYYYY
 ```
 
@@ -29,7 +29,7 @@ Es idempotente: se puede volver a ejecutar para corregir la política sin borrar
 Si tu repositorio no es `fjbatresv/rocker-mc`, exportá `GITHUB_REPO` antes:
 
 ```bash
-GITHUB_REPO=usuario/repo ./crear-rol.sh produccion mi-bucket E1XXXX
+GITHUB_REPO=usuario/repo ./crear-rol.sh prod mi-bucket E1XXXX
 ```
 
 ---
@@ -50,7 +50,7 @@ Alternativas más flojas y por qué no:
 |---|---|
 | `repo:usuario/repo:*` | Cualquier rama, cualquier PR de un tercero, puede desplegar a producción |
 | `repo:usuario/repo:ref:refs/heads/main` | Mejor, pero dev y producción quedan indistinguibles: un solo rol para ambos |
-| `repo:usuario/repo:environment:produccion` | Solo los jobs que declaran ese environment — y ese environment puede exigir aprobación |
+| `repo:usuario/repo:environment:prod` | Solo los jobs que declaran ese environment — y ese environment puede exigir aprobación |
 
 La condición `aud` es igual de necesaria: sin ella, un token emitido para otra audiencia podría servir.
 
@@ -76,11 +76,11 @@ Todo está acotado por recurso: el bucket y la distribución **de ese entorno**,
 
 ```bash
 # Quién puede asumirlo
-aws iam get-role --role-name rockers502-deploy-produccion \
+aws iam get-role --role-name rockers502-deploy-prod \
   --query 'Role.AssumeRolePolicyDocument' --output json
 
 # Qué puede hacer
-aws iam get-role-policy --role-name rockers502-deploy-produccion \
+aws iam get-role-policy --role-name rockers502-deploy-prod \
   --policy-name rockers502-deploy-policy --output json
 ```
 

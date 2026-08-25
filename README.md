@@ -1,6 +1,6 @@
 # Rockers 502 MG Guatemala — sitio institucional
 
-Sitio estático de una sola página. Sin framework, sin backend y sin paso de compilación obligatorio: HTML, un CSS y un JavaScript de unas 150 líneas. Vive en un bucket de S3 detrás de CloudFront, con dos entornos: un push a `main` publica en dev y luego deja producción esperando aprobación del Environment `produccion`.
+Sitio estático de una sola página. Sin framework, sin backend y sin paso de compilación obligatorio: HTML, un CSS y un JavaScript de unas 150 líneas. Vive en un bucket de S3 detrás de CloudFront, con dos entornos: un push a `main` publica en dev y luego deja producción esperando aprobación del Environment `prod`.
 
 ---
 
@@ -98,7 +98,7 @@ El script separa el fondo con un relleno por inundación desde los bordes en lug
 | Buscadores | bloqueado (`robots.txt` con `Disallow: /`, sin sitemap) | indexable |
 | Para qué | ver el sitio real antes de exponerlo | el sitio del club |
 
-Un merge a `main` publica en dev. Si ese despliegue termina bien, GitHub crea el job de producción y lo deja esperando la aprobación configurada en el Environment `produccion`. También se puede relanzar desde **Actions → Desplegar → Run workflow**: elegir `dev` solo publica dev; elegir `produccion` publica dev primero y luego producción.
+Un merge a `main` publica en dev. Si ese despliegue termina bien, GitHub crea el job de producción y lo deja esperando la aprobación configurada en el Environment `prod`. También se puede relanzar desde **Actions → Desplegar → Run workflow**: elegir `dev` solo publica dev; elegir `prod` publica dev primero y luego producción.
 
 Ambos pasan primero por el job `verificar`, que comprueba que los cuatro archivos críticos existan y que ninguna referencia local del HTML apunte a un archivo inexistente.
 
@@ -115,7 +115,7 @@ Run workflow ──→ verificar ──→ dev ──→ producción si se eligi
 
 ### Configurar los Environments
 
-En **Settings → Environments**, creá dos: `dev` y `produccion`. En cada uno:
+En **Settings → Environments**, creá dos: `dev` y `prod`. En cada uno:
 
 **Variables** (`Environment variables`, visibles en los logs):
 
@@ -136,7 +136,7 @@ En **Settings → Environments**, creá dos: `dev` y `produccion`. En cada uno:
 
 Si a un entorno le falta cualquiera de los cinco, el workflow falla en el primer paso con un mensaje que dice exactamente cuál, en vez de reventar más adelante con un error de la AWS CLI.
 
-**Protección recomendada para `produccion`:** en **Settings → Environments → produccion**, activá *Required reviewers* con uno o dos miembros. Con eso, aunque alguien lance el workflow, la publicación queda esperando aprobación.
+**Protección recomendada para `prod`:** en **Settings → Environments → prod**, activá *Required reviewers* con uno o dos miembros. Con eso, aunque alguien lance el workflow, la publicación queda esperando aprobación.
 
 ### Infraestructura, por cada entorno
 
@@ -213,7 +213,7 @@ Las políticas de IAM están en [`infra/`](infra/), con su propio README. Un rol
 
 ```bash
 cd infra
-./crear-rol.sh produccion rockers502-gt-site E1XXXXXXXXXXXX
+./crear-rol.sh prod      rockers502-gt-site E1XXXXXXXXXXXX
 ./crear-rol.sh dev        rockers502-gt-dev  E2YYYYYYYYYYYY
 ```
 
@@ -222,7 +222,7 @@ El script crea el proveedor OIDC si no existe, crea o actualiza el rol, aplica l
 La condición clave de la trust policy fija el `sub` al **environment**, no a la rama:
 
 ```
-repo:fjbatresv/rocker-mc:environment:produccion
+repo:fjbatresv/rocker-mc:environment:prod
 ```
 
 Eso es lo que impide que el job de dev asuma el rol de producción. En [`infra/README.md`](infra/README.md) está el detalle de por qué cada permiso es necesario y qué hacer si algo falla.

@@ -1,7 +1,7 @@
 name: Desplegar
 
 # Un merge a main publica en dev automáticamente y deja producción esperando
-# la aprobación del Environment `produccion`.
+# la aprobación del Environment `prod`.
 on:
   push:
     branches: [main]
@@ -15,8 +15,8 @@ on:
         description: 'Entorno a publicar'
         type: choice
         required: true
-        default: produccion
-        options: [produccion, dev]
+        default: prod
+        options: [prod, dev]
 
 # Heredado por los workflows llamados: necesario para el token OIDC de AWS.
 permissions:
@@ -132,16 +132,16 @@ jobs:
             echo "- Indexable: false"
           } >> "$GITHUB_STEP_SUMMARY"
 
-  produccion:
+  prod:
     name: Producción
     needs: dev
-    if: github.event_name == 'push' || inputs.entorno == 'produccion'
+    if: github.event_name == 'push' || inputs.entorno == 'prod'
     runs-on: ubuntu-latest
     environment:
-      name: produccion
+      name: prod
       url: ${{ vars.SITE_URL }}
     concurrency:
-      group: desplegar-produccion
+      group: desplegar-prod
       cancel-in-progress: false
     steps:
       - name: Descargar el repositorio
@@ -162,10 +162,10 @@ jobs:
           [ -n "$BUCKET" ]       || faltan+=("secreto AWS_S3_BUCKET")
           [ -n "$DISTRIBUTION" ] || faltan+=("secreto AWS_CLOUDFRONT_DISTRIBUTION_ID")
           if [ ${#faltan[@]} -gt 0 ]; then
-            echo "::error::Al entorno 'produccion' le falta: ${faltan[*]}"
+            echo "::error::Al entorno 'prod' le falta: ${faltan[*]}"
             exit 1
           fi
-          echo "Entorno produccion · región $AWS_REGION · $SITE_URL"
+          echo "Entorno prod · región $AWS_REGION · $SITE_URL"
 
       - name: Asumir el rol de AWS
         uses: aws-actions/configure-aws-credentials@v4
@@ -213,7 +213,7 @@ jobs:
       - name: Resumen
         run: |
           {
-            echo "### Publicado en produccion"
+            echo "### Publicado en prod"
             echo ""
             echo "- URL: ${{ vars.SITE_URL }}"
             echo "- Región: ${{ vars.AWS_REGION }}"

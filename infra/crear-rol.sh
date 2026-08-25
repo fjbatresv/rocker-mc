@@ -3,7 +3,7 @@
 # Crea (o actualiza) el rol de IAM que GitHub Actions asume por OIDC para
 # publicar el sitio en un entorno.
 #
-#   ./crear-rol.sh produccion rockers502-gt-site E1XXXXXXXXXXXX
+#   ./crear-rol.sh prod      rockers502-gt-site E1XXXXXXXXXXXX
 #   ./crear-rol.sh dev        rockers502-gt-dev  E2YYYYYYYYYYYY
 #
 # El nombre del entorno debe coincidir con el Environment de GitHub, porque la
@@ -20,7 +20,7 @@ AQUI="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [ $# -ne 3 ]; then
   echo "Uso: $0 <entorno> <bucket> <distribution-id>" >&2
-  echo "Ejemplo: $0 produccion rockers502-gt-site E1XXXXXXXXXXXX" >&2
+  echo "Ejemplo: $0 prod rockers502-gt-site E1XXXXXXXXXXXX" >&2
   exit 1
 fi
 
