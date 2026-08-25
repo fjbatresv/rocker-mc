@@ -1,0 +1,67 @@
+name: Desplegar
+
+# Un merge a main publica en dev automáticamente.
+# Producción se lanza a mano desde la pestaña Actions → Run workflow.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - '.github/workflows/**'
+      - '.github/scripts/**'
+  workflow_dispatch:
+    inputs:
+      entorno:
+        description: 'Entorno a publicar'
+        type: choice
+        required: true
+        default: produccion
+        options: [produccion, dev]
+
+# Heredado por los workflows llamados: necesario para el token OIDC de AWS.
+permissions:
+  id-token: write
+  contents: read
+
+# Un despliegue a la vez por entorno. No se cancela el que está en curso:
+# cortarlo a medias dejaría el bucket sincronizado a medias.
+concurrency:
+  group: desplegar-${{ github.event.inputs.entorno || 'dev' }}
+  cancel-in-progress: false
+
+jobs:
+  verificar:
+    name: Verificar el sitio
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Archivos críticos presentes
+        run: |
+          for f in site/index.html site/404.html site/assets/css/styles.css site/assets/js/main.js; do
+            [ -s "$f" ] || { echo "::error::Falta o está vacío: $f"; exit 1; }
+          done
+
+      - name: Sin referencias rotas
+        run: python3 .github/scripts/verificar_enlaces.py
+
+  dev:
+    name: Dev
+    needs: verificar
+    if: github.event_name == 'push' || inputs.entorno == 'dev'
+    uses: ./.github/workflows/publicar.yml
+    with:
+      entorno: dev
+      indexable: false
+    secrets: inherit
+
+  produccion:
+    name: Producción
+    needs: verificar
+    if: github.event_name == 'workflow_dispatch' && inputs.entorno == 'produccion'
+    uses: ./.github/workflows/publicar.yml
+    with:
+      entorno: produccion
+      indexable: true
+    secrets: inherit
