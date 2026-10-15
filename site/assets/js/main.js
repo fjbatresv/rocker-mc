@@ -1,5 +1,5 @@
 /*!
- * Rockers 502 MG Guatemala — interacción del sitio
+ * Rockers 502 MC Guatemala — interacción del sitio
  * Sin dependencias. El sitio funciona completo si este archivo no carga.
  */
 (function () {

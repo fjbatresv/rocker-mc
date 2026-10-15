@@ -1,4 +1,4 @@
-# Rockers 502 MG Guatemala — sitio institucional
+# Rockers 502 MC Guatemala — sitio institucional
 
 Sitio estático de una sola página. Sin framework, sin backend y sin paso de compilación obligatorio: HTML, un CSS y un JavaScript de unas 150 líneas. Vive en un bucket de S3 detrás de CloudFront, con dos entornos: un push a `main` publica en dev y luego deja producción esperando aprobación del Environment `prod`.
 

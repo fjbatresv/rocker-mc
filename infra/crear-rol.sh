@@ -76,7 +76,7 @@ else
   echo "==> Creando el rol"
   aws iam create-role \
     --role-name "$ROL" \
-    --description "Despliegue del sitio de Rockers 502 MG (entorno ${ENTORNO})" \
+    --description "Despliegue del sitio de Rockers 502 MC (entorno ${ENTORNO})" \
     --max-session-duration 3600 \
     --assume-role-policy-document "file://$TMP/trust.json" >/dev/null
 fi
