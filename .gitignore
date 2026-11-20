@@ -10,3 +10,12 @@
 *.log
 .tmp/
 __pycache__/
+
+# Secretos y credenciales locales
+.env
+.env.*
+*.pem
+*.key
+
+# Capturas de herramientas de navegador
+.playwright-mcp/

@@ -4,20 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Rockers 502 MC Guatemala — Moto Club</title>
-<meta name="description" content="Rockers 502 MC Guatemala, rodando desde 2019: un camino, una familia, una misma pasión. Historia, simbología del emblema, estructura del grupo y requisitos de ingreso.">
-<link rel="canonical" href="https://www.rockers502.gt/">
+<meta name="description" content="Moto club guatemalteco rodando desde 2019: historia, simbología del emblema, estructura del grupo, capítulos y requisitos para unirte a Rockers 502 MC.">
+<link rel="canonical" href="https://rockers.fjbatresv.com/">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Rockers 502 MC Guatemala">
 <meta property="og:title" content="Rockers 502 MC Guatemala">
 <meta property="og:description" content="Rodando desde 2019. Un camino, una familia, una misma pasión.">
-<meta property="og:url" content="https://www.rockers502.gt/">
-<meta property="og:image" content="https://www.rockers502.gt/assets/img/og.jpg">
+<meta property="og:url" content="https://rockers.fjbatresv.com/">
+<meta property="og:image" content="https://rockers.fjbatresv.com/assets/img/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:alt" content="Emblema de Rockers 502 MC Guatemala sobre una fotografía del grupo en ruta.">
 <meta property="og:locale" content="es_GT">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image:alt" content="Emblema de Rockers 502 MC Guatemala sobre una fotografía del grupo en ruta.">
 <meta name="theme-color" content="#0A0A0B">
+<meta name="color-scheme" content="dark">
 
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" href="assets/img/favicon-512.png" sizes="512x512">
@@ -32,11 +36,23 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Organization",
+  "@graph": [
+  {
+  "@type": "WebSite",
+  "@id": "https://rockers.fjbatresv.com/#sitio",
+  "url": "https://rockers.fjbatresv.com/",
+  "name": "Rockers 502 MC Guatemala",
+  "inLanguage": "es-GT",
+  "publisher": { "@id": "https://rockers.fjbatresv.com/#club" }
+  },
+  {
+  "@type": "SportsOrganization",
+  "@id": "https://rockers.fjbatresv.com/#club",
+  "sport": "Motociclismo",
   "name": "Rockers 502 MC Guatemala",
   "alternateName": "Rockers 502 MC",
-  "url": "https://www.rockers502.gt/",
-  "logo": "https://www.rockers502.gt/assets/img/emblem.webp",
+  "url": "https://rockers.fjbatresv.com/",
+  "logo": "https://rockers.fjbatresv.com/assets/img/emblem.webp",
   "foundingDate": "2019",
   "areaServed": "GT",
   "description": "Moto club guatemalteco de motocicletas de estilo clásico y customizadas.",
@@ -45,11 +61,13 @@
     "https://www.instagram.com/rockers502mggt/",
     "https://www.tiktok.com/@rockers.mg.guate"
   ]
+  }
+  ]
 }
 </script>
 </head>
 <body>
-<a class="skip" href="#nosotros">Saltar al contenido</a>
+<a class="skip" href="#contenido">Saltar al contenido</a>
 
 <header class="site-header" data-header>
   <div class="wrap nav">
@@ -57,7 +75,7 @@
       <img src="assets/img/emblem.webp" width="42" height="42" alt="">
       <span><b>Rockers 502 MC</b><span>Guatemala</span></span>
     </a>
-    <ul class="nav-list" data-menu>
+    <ul class="nav-list" id="menu-principal" data-menu>
       <li><a href="#nosotros">Nosotros</a></li>
       <li><a href="#estilos">Estilos</a></li>
       <li><a href="#emblema">Emblema</a></li>
@@ -67,13 +85,13 @@
       <li><a href="#unete">Únete</a></li>
     </ul>
     <a class="btn btn--sm" href="#unete">Quiero unirme</a>
-    <button class="burger" data-burger type="button" aria-label="Abrir menú" aria-expanded="false">
+    <button class="burger" data-burger type="button" aria-label="Abrir menú" aria-controls="menu-principal" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
   </div>
 </header>
 
-<main>
+<main id="contenido" tabindex="-1">
 
 <!-- ===== Hero ===== -->
 <section class="hero" id="inicio">
@@ -130,7 +148,7 @@
   <div class="wrap">
     <p class="kicker rv">Nuestras máquinas</p>
     <h2 class="rv">Los estilos<br>que rodamos</h2>
-    <p class="lead mute narrow rv" style="margin-bottom:56px">De la línea clásica de calle a la customización más personal. Lo que nos une no es la marca ni el estilo: es que la máquina lleve tu mano encima.</p>
+    <p class="lead mute narrow rv gap-lg">De la línea clásica de calle a la customización más personal. Lo que nos une no es la marca ni el estilo: es que la máquina lleve tu mano encima.</p>
     <div class="machines rv">
       <figure><img src="assets/img/maquinas/moto-1.webp" width="1200" height="1200" loading="lazy" alt="Motocicleta de asiento individual y guardabarros recortado, estacionada de perfil en la calle."></figure>
       <figure><img src="assets/img/maquinas/moto-2.webp" width="760" height="760" loading="lazy" alt="Hilera de motocicletas del grupo estacionadas sobre una calle empedrada, vista desde arriba."></figure>
@@ -198,7 +216,7 @@
   <div class="wrap">
     <p class="kicker rv">Estructura</p>
     <h2 class="rv">El camino dentro<br>del grupo</h2>
-    <p class="lead mute narrow rv" style="margin-bottom:56px">Pertenecer se gana rodando. Estos son los niveles, las distinciones y los capítulos que forman el Moto Club.</p>
+    <p class="lead mute narrow rv gap-lg">Pertenecer se gana rodando. Estos son los niveles, las distinciones y los capítulos que forman el Moto Club.</p>
 
     <div class="path rv">
       <div class="step">
@@ -236,7 +254,7 @@
   <div class="wrap">
     <p class="kicker rv">En la ruta</p>
     <h2 class="rv">Cada rodada<br>es un cuadro más</h2>
-    <p class="lead mute narrow rv" style="margin-bottom:48px">Las carreteras que hemos recorrido y la gente con la que las recorrimos.</p>
+    <p class="lead mute narrow rv gap-md">Las carreteras que hemos recorrido y la gente con la que las recorrimos.</p>
     <div class="carousel rv">
       <div class="carousel-track" data-carousel-track tabindex="0" role="region" aria-label="Galería de rodadas">
         <figure class="carousel-slide"><img src="assets/img/rodadas/rodada-1.webp" width="1100" height="733" alt="Integrantes de Rockers 502 MC reunidos junto a sus motocicletas antes de iniciar la rodada."><figcaption>Todos listos antes de arrancar</figcaption></figure>
@@ -251,7 +269,7 @@
       <div class="carousel-nav">
         <button class="carousel-btn" type="button" data-carousel-prev aria-label="Foto anterior">&#8249;</button>
         <button class="carousel-btn" type="button" data-carousel-next aria-label="Foto siguiente">&#8250;</button>
-        <div class="carousel-dots" data-carousel-dots role="tablist" aria-label="Ir a la foto"></div>
+        <div class="carousel-dots" data-carousel-dots role="group" aria-label="Ir a la foto"></div>
       </div>
     </div>
   </div>
@@ -262,7 +280,7 @@
   <div class="wrap">
     <p class="kicker rv">Cómo ingresar</p>
     <h2 class="rv">¿Quieres unirte<br>a Rockers 502 MC?</h2>
-    <p class="lead narrow rv" style="margin-bottom:48px">Buscamos gente que quiera pasarla bien y rodar con propósito. Estos son los requisitos.</p>
+    <p class="lead narrow rv gap-md">Buscamos gente que quiera pasarla bien y rodar con propósito. Estos son los requisitos.</p>
     <ul class="reqs rv">
       <li class="req"><p>Motocicleta de <strong>línea clásica de calle o customizada</strong> —café racer, bobber, chopper, cruiser, tracker, brat— o al menos 50&nbsp;% modificada, sin discriminación de cilindraje.</p></li>
       <li class="req"><p>Casco en buen estado, <strong>no mayor a cuatro años</strong>, por la seguridad de todos los integrantes.</p></li>

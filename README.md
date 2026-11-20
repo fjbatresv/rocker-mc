@@ -90,149 +90,31 @@ El script separa el fondo con un relleno por inundación desde los bordes en lug
 
 ## Despliegue
 
-### Dos entornos
+El workflow publica en AWS cuando hay un push a `main` que cambia `site/**`, el propio workflow o `.github/scripts/**`. `workflow_dispatch` publica solo si se ejecuta desde `main`. Los pull requests a `main` corren la verificación y no despliegan.
 
-| | dev | producción |
+El único job de publicación usa el GitHub Environment `dev`. Conserva ese nombre porque la trust policy del rol IAM está fijada a `repo:fjbatresv/rocker-mc:environment:dev`; el sitio que publica es el público e indexable.
+
+En **Settings → Environments → dev**, configurá estas variables y secretos:
+
+| Tipo | Nombre | Uso |
 |---|---|---|
-| Se dispara | automático, en cada push a `main` que toque `site/**` | automático después de dev, pausado por reviewers del Environment |
-| Buscadores | bloqueado (`robots.txt` con `Disallow: /`, sin sitemap) | indexable |
-| Para qué | ver el sitio real antes de exponerlo | el sitio del club |
+| Variable | `AWS_REGION` | Región de AWS |
+| Variable | `SITE_URL` | `https://rockers.fjbatresv.com` |
+| Secreto | `AWS_ROLE_ARN` | Rol asumido mediante OIDC |
+| Secreto | `AWS_S3_BUCKET` | Bucket del sitio |
+| Secreto | `AWS_CLOUDFRONT_DISTRIBUTION_ID` | Distribución que se invalida |
 
-Un merge a `main` publica en dev. Si ese despliegue termina bien, GitHub crea el job de producción y lo deja esperando la aprobación configurada en el Environment `prod`. También se puede relanzar desde **Actions → Desplegar → Run workflow**: elegir `dev` solo publica dev; elegir `prod` publica dev primero y luego producción.
+Los secretos se usan mediante variables de entorno; no se guardan llaves de AWS en GitHub. La configuración del rol OIDC está documentada en [`infra/`](infra/).
 
-Ambos pasan primero por el job `verificar`, que comprueba que los cuatro archivos críticos existan y que ninguna referencia local del HTML apunte a un archivo inexistente.
-
+```text
+push a main ──→ verificar ──→ desplegar
+PR ──→ verificar
 ```
-push a main ──→ verificar ──→ dev ──→ producción (requiere aprobación)
-Run workflow ──→ verificar ──→ dev ──→ producción si se eligió producción
-```
 
-### Por qué un solo workflow
-
-`deploy.yml` contiene toda la secuencia. Producción no se dispara desde un workflow separado: es un job dentro del mismo grafo con `needs: dev`. Eso deja explícita la regla operativa importante: nada llega a producción si antes no terminó el despliegue a dev.
-
-**Nada específico de un entorno vive en el código.** La región, la URL, el bucket, el rol y la distribución salen del Environment de GitHub. Cambiar de cuenta de AWS o de región no toca el repositorio.
-
-### Configurar los Environments
-
-En **Settings → Environments**, creá dos: `dev` y `prod`. En cada uno:
-
-**Variables** (`Environment variables`, visibles en los logs):
-
-| Variable | Ejemplo dev | Ejemplo producción |
-|---|---|---|
-| `AWS_REGION` | `us-east-1` | `us-east-1` |
-| `SITE_URL` | `https://dev.rockers502.gt/` | `https://www.rockers502.gt/` |
-
-**Secretos** (`Environment secrets`, ocultos en los logs):
-
-| Secreto | Qué es |
-|---|---|
-| `AWS_ROLE_ARN` | Rol que asume el workflow en ese entorno |
-| `AWS_S3_BUCKET` | Bucket de ese entorno |
-| `AWS_CLOUDFRONT_DISTRIBUTION_ID` | Distribución de ese entorno |
-
-> Los tres son **identificadores**, no credenciales — no hay ninguna llave de acceso guardada en GitHub. Aun así van como secretos: publicar el ARN de un rol y el nombre del bucket le ahorra trabajo de reconocimiento a quien quiera intentar algo.
-
-Si a un entorno le falta cualquiera de los cinco, el workflow falla en el primer paso con un mensaje que dice exactamente cuál, en vez de reventar más adelante con un error de la AWS CLI.
-
-**Protección recomendada para `prod`:** en **Settings → Environments → prod**, activá *Required reviewers* con uno o dos miembros. Con eso, aunque alguien lance el workflow, la publicación queda esperando aprobación.
-
-### Infraestructura, por cada entorno
-
-Lo que sigue hay que hacerlo dos veces —una por entorno—, cambiando el nombre del bucket y el subdominio. Si preferís empezar con uno solo, montá producción y dejá el Environment `dev` sin configurar: el job de dev fallará con un mensaje claro y producción seguirá funcionando a mano.
-
-#### 1. Bucket privado
+El job de verificación comprueba archivos críticos, pruebas del verificador, enlaces locales y compatibilidad de seguridad/URLs. `deploy.sh` permite hacer el mismo despliegue manual: requiere `ROCKERS_BUCKET` y `ROCKERS_DISTRIBUTION_ID`.
 
 ```bash
-aws s3 mb s3://rockers502-gt-site --region us-east-1        # producción
-aws s3 mb s3://rockers502-gt-dev  --region us-east-1        # dev
-aws s3api put-public-access-block \
-  --bucket rockers502-gt-site \
-  --public-access-block-configuration \
-    "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"
-```
-
-Sin *static website hosting*: CloudFront habla con el bucket por su endpoint REST.
-
-#### 2. Certificado TLS
-
-Debe estar en **`us-east-1`**, sin importar dónde esté el bucket. Es el tropiezo más común al montar esto por primera vez. Un solo certificado puede cubrir los tres nombres:
-
-```bash
-aws acm request-certificate \
-  --region us-east-1 \
-  --domain-name rockers502.gt \
-  --subject-alternative-names www.rockers502.gt dev.rockers502.gt \
-  --validation-method DNS
-```
-
-Validá creando los CNAME que devuelve ACM.
-
-#### 3. Distribución de CloudFront
-
-| Ajuste | Valor |
-|--------|-------|
-| Origen | El bucket S3 con **Origin Access Control** (no OAI, que está en desuso) |
-| Viewer protocol policy | `Redirect HTTP to HTTPS` |
-| Default root object | `index.html` |
-| Compress objects automatically | Sí (Brotli y gzip) |
-| Cache policy | `CachingOptimized` administrada |
-| Alternate domain names | producción: `rockers502.gt`, `www.rockers502.gt` · dev: `dev.rockers502.gt` |
-| Custom error response | `403` → `/404.html` con código de respuesta `404` |
-
-> El **403 → 404.html no es opcional.** Un bucket privado responde `403 AccessDenied` —no `404`— cuando la llave no existe. Sin esa regla, quien escriba mal una URL vería un error crudo de AWS en vez de la página del club.
-
-Al terminar, CloudFront ofrece copiar la política del bucket:
-
-```json
-{
-  "Version": "2008-10-17",
-  "Statement": [{
-    "Sid": "AllowCloudFrontServicePrincipal",
-    "Effect": "Allow",
-    "Principal": { "Service": "cloudfront.amazonaws.com" },
-    "Action": "s3:GetObject",
-    "Resource": "arn:aws:s3:::rockers502-gt-site/*",
-    "Condition": {
-      "StringEquals": {
-        "AWS:SourceArn": "arn:aws:cloudfront::<ACCOUNT_ID>:distribution/<DISTRIBUTION_ID>"
-      }
-    }
-  }]
-}
-```
-
-#### 4. DNS
-
-En Route 53, registros **A de tipo alias** hacia cada distribución: el dominio raíz y `www` a producción, `dev` a la de desarrollo. El raíz no admite CNAME.
-
-#### 5. Conectar GitHub con AWS (OIDC)
-
-Las políticas de IAM están en [`infra/`](infra/), con su propio README. Un rol por entorno:
-
-```bash
-cd infra
-./crear-rol.sh prod      rockers502-gt-site E1XXXXXXXXXXXX
-./crear-rol.sh dev        rockers502-gt-dev  E2YYYYYYYYYYYY
-```
-
-El script crea el proveedor OIDC si no existe, crea o actualiza el rol, aplica los permisos mínimos e imprime los valores exactos para cargar en el Environment de GitHub. Es idempotente.
-
-La condición clave de la trust policy fija el `sub` al **environment**, no a la rama:
-
-```
-repo:fjbatresv/rocker-mc:environment:prod
-```
-
-Eso es lo que impide que el job de dev asuma el rol de producción. En [`infra/README.md`](infra/README.md) está el detalle de por qué cada permiso es necesario y qué hacer si algo falla.
-
-### Despliegue manual
-
-`deploy.sh` hace lo mismo desde una terminal, por si Actions no está disponible:
-
-```bash
-export ROCKERS_BUCKET=rockers502-gt-site
+export ROCKERS_BUCKET=nombre-del-bucket
 export ROCKERS_DISTRIBUTION_ID=E1XXXXXXXXXXXX
 ./deploy.sh
 ```
@@ -280,7 +162,7 @@ Objetivos que el sitio cumple y conviene verificar tras el despliegue:
 
 ## Pendientes antes de salir a producción
 
-1. **Confirmar el dominio.** Todo apunta a `rockers502.gt`; si se elige otro, hay que actualizar `canonical`, Open Graph, `sitemap.xml`, `robots.txt` y el JSON-LD de `index.html`.
+1. El dominio es `rockers.fjbatresv.com`; si cambia, actualizá `SITIO` en `verificar_seguridad.py` y corré el verificador: te lista cada archivo a tocar.
 2. **Validar los ocho estilos de moto** y sus descripciones con la mesa directiva. El requisito publicado en 2021 nombra solo cuatro; el sitio ya lo redacta ampliado.
 3. **Pies de foto del carrusel.** Hoy son descriptivos genéricos; reemplazarlos por lugar y fecha reales.
 4. **Derechos de imagen.** Hay caras reconocibles en las fotos de rodadas. Conviene el visto bueno de quienes aparecen.

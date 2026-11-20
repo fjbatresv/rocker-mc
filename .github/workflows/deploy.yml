@@ -1,26 +1,17 @@
 name: Desplegar
 
-# Un merge a main publica en dev automáticamente y deja producción esperando
-# la aprobación del Environment `prod`.
 on:
   push:
     branches: [main]
     paths:
       - 'site/**'
-      - '.github/workflows/**'
+      - '.github/workflows/deploy.yml'
       - '.github/scripts/**'
+  pull_request:
+    branches: [main]
   workflow_dispatch:
-    inputs:
-      entorno:
-        description: 'Entorno a publicar'
-        type: choice
-        required: true
-        default: prod
-        options: [prod, dev]
 
-# Heredado por los workflows llamados: necesario para el token OIDC de AWS.
 permissions:
-  id-token: write
   contents: read
 
 jobs:
@@ -29,7 +20,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Descargar el repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Archivos críticos presentes
         run: |
@@ -37,25 +30,35 @@ jobs:
             [ -s "$f" ] || { echo "::error::Falta o está vacío: $f"; exit 1; }
           done
 
-      - name: Sin referencias rotas
+      - name: Pruebas de seguridad
+        run: python3 -m unittest discover -s .github/scripts -p 'test_*.py'
+
+      - name: Verificar enlaces
         run: python3 .github/scripts/verificar_enlaces.py
 
-  dev:
-    name: Dev
+      - name: Verificar seguridad y URLs
+        run: python3 .github/scripts/verificar_seguridad.py
+
+  desplegar:
+    name: Desplegar en AWS
     needs: verificar
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
       contents: read
+      id-token: write
     environment:
       name: dev
       url: ${{ vars.SITE_URL }}
     concurrency:
-      group: desplegar-dev
+      group: desplegar-aws
       cancel-in-progress: false
+    timeout-minutes: 20
     steps:
       - name: Descargar el repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Comprobar la configuración del entorno
         env:
@@ -77,146 +80,70 @@ jobs:
           fi
           echo "Entorno dev · región $AWS_REGION · $SITE_URL"
 
-      - name: Asumir el rol de AWS
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: ${{ vars.AWS_REGION }}
-
-      - name: Bloquear la indexación
-        run: |
-          printf 'User-agent: *\nDisallow: /\n' > site/robots.txt
-          rm -f site/sitemap.xml
-          echo "robots.txt reemplazado por uno que bloquea todo y sitemap.xml retirado."
-
-      - name: Subir assets con caché larga
-        run: |
-          aws s3 sync site/assets "s3://${{ secrets.AWS_S3_BUCKET }}/assets" \
-            --delete \
-            --cache-control "public, max-age=31536000, immutable"
-
-      - name: Subir HTML y metadatos sin caché de navegador
-        run: |
-          aws s3 sync site "s3://${{ secrets.AWS_S3_BUCKET }}" \
-            --delete \
-            --exclude "assets/*" \
-            --cache-control "public, max-age=0, must-revalidate"
-
-      - name: Corregir Content-Type de robots
-        run: |
-          aws s3 cp "s3://${{ secrets.AWS_S3_BUCKET }}/robots.txt" \
-                    "s3://${{ secrets.AWS_S3_BUCKET }}/robots.txt" \
-            --content-type "text/plain; charset=utf-8" \
-            --cache-control "public, max-age=3600" \
-            --metadata-directive REPLACE
-
-      - name: Invalidar CloudFront
-        run: |
-          ID=$(aws cloudfront create-invalidation \
-            --distribution-id "${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }}" \
-            --paths "/*" \
-            --query 'Invalidation.Id' --output text)
-          echo "Invalidación $ID en curso"
-          aws cloudfront wait invalidation-completed \
-            --distribution-id "${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }}" \
-            --id "$ID"
-
-      - name: Resumen
-        run: |
-          {
-            echo "### Publicado en dev"
-            echo ""
-            echo "- URL: ${{ vars.SITE_URL }}"
-            echo "- Región: ${{ vars.AWS_REGION }}"
-            echo "- Commit: \`${GITHUB_SHA::7}\`"
-            echo "- Indexable: false"
-          } >> "$GITHUB_STEP_SUMMARY"
-
-  prod:
-    name: Producción
-    needs: dev
-    if: github.event_name == 'push' || inputs.entorno == 'prod'
-    runs-on: ubuntu-latest
-    environment:
-      name: prod
-      url: ${{ vars.SITE_URL }}
-    concurrency:
-      group: desplegar-prod
-      cancel-in-progress: false
-    steps:
-      - name: Descargar el repositorio
-        uses: actions/checkout@v4
-
-      - name: Comprobar la configuración del entorno
+      - name: Las URLs del sitio coinciden con SITE_URL
         env:
-          AWS_REGION: ${{ vars.AWS_REGION }}
           SITE_URL: ${{ vars.SITE_URL }}
-          ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
-          BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-          DISTRIBUTION: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
-        run: |
-          faltan=()
-          [ -n "$AWS_REGION" ]   || faltan+=("variable AWS_REGION")
-          [ -n "$SITE_URL" ]     || faltan+=("variable SITE_URL")
-          [ -n "$ROLE_ARN" ]     || faltan+=("secreto AWS_ROLE_ARN")
-          [ -n "$BUCKET" ]       || faltan+=("secreto AWS_S3_BUCKET")
-          [ -n "$DISTRIBUTION" ] || faltan+=("secreto AWS_CLOUDFRONT_DISTRIBUTION_ID")
-          if [ ${#faltan[@]} -gt 0 ]; then
-            echo "::error::Al entorno 'prod' le falta: ${faltan[*]}"
-            exit 1
-          fi
-          echo "Entorno prod · región $AWS_REGION · $SITE_URL"
+        run: python3 .github/scripts/verificar_seguridad.py --sitio "$SITE_URL"
 
       - name: Asumir el rol de AWS
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
 
       - name: Subir assets con caché larga
+        env:
+          BUCKET: ${{ secrets.AWS_S3_BUCKET }}
         run: |
-          aws s3 sync site/assets "s3://${{ secrets.AWS_S3_BUCKET }}/assets" \
+          aws s3 sync site/assets "s3://$BUCKET/assets" \
             --delete \
             --cache-control "public, max-age=31536000, immutable"
 
       - name: Subir HTML y metadatos sin caché de navegador
+        env:
+          BUCKET: ${{ secrets.AWS_S3_BUCKET }}
         run: |
-          aws s3 sync site "s3://${{ secrets.AWS_S3_BUCKET }}" \
+          aws s3 sync site "s3://$BUCKET" \
             --delete \
             --exclude "assets/*" \
             --cache-control "public, max-age=0, must-revalidate"
 
       - name: Corregir Content-Type de robots y sitemap
+        env:
+          BUCKET: ${{ secrets.AWS_S3_BUCKET }}
         run: |
-          aws s3 cp "s3://${{ secrets.AWS_S3_BUCKET }}/robots.txt" \
-                    "s3://${{ secrets.AWS_S3_BUCKET }}/robots.txt" \
+          aws s3 cp "s3://$BUCKET/robots.txt" "s3://$BUCKET/robots.txt" \
             --content-type "text/plain; charset=utf-8" \
             --cache-control "public, max-age=3600" \
             --metadata-directive REPLACE
-          aws s3 cp "s3://${{ secrets.AWS_S3_BUCKET }}/sitemap.xml" \
-                    "s3://${{ secrets.AWS_S3_BUCKET }}/sitemap.xml" \
+          aws s3 cp "s3://$BUCKET/sitemap.xml" "s3://$BUCKET/sitemap.xml" \
             --content-type "application/xml" \
             --cache-control "public, max-age=3600" \
             --metadata-directive REPLACE
 
       - name: Invalidar CloudFront
+        env:
+          DISTRIBUTION: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
         run: |
           ID=$(aws cloudfront create-invalidation \
-            --distribution-id "${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }}" \
+            --distribution-id "$DISTRIBUTION" \
             --paths "/*" \
             --query 'Invalidation.Id' --output text)
           echo "Invalidación $ID en curso"
           aws cloudfront wait invalidation-completed \
-            --distribution-id "${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }}" \
+            --distribution-id "$DISTRIBUTION" \
             --id "$ID"
 
       - name: Resumen
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
         run: |
           {
-            echo "### Publicado en prod"
+            echo "### Publicado en AWS"
             echo ""
-            echo "- URL: ${{ vars.SITE_URL }}"
-            echo "- Región: ${{ vars.AWS_REGION }}"
+            echo "- URL: $SITE_URL"
+            echo "- Región: $AWS_REGION"
             echo "- Commit: \`${GITHUB_SHA::7}\`"
             echo "- Indexable: true"
           } >> "$GITHUB_STEP_SUMMARY"
