@@ -183,14 +183,14 @@ git commit -m "Verificador de CSP y URLs absolutas del sitio"
 **Interfaces:**
 - Produces: la política `rockers502-cabeceras-seguridad`, asociada al `DefaultCacheBehavior` de la distribución.
 
-- [ ] **Paso 1: Escribí `cabeceras-seguridad.json`** con `Name: rockers502-cabeceras-seguridad` y estos valores exactos, todos con `Override: true`:
+- [x] **Paso 1: Escribí `cabeceras-seguridad.json`** con `Name: rockers502-cabeceras-seguridad` y estos valores exactos, todos con `Override: true`:
   - `ContentSecurityPolicy`: `default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests`
   - `StrictTransportSecurity`: `AccessControlMaxAgeSec: 31536000`, `IncludeSubdomains: true`, `Preload: false`
   - `ContentTypeOptions`: activado
   - `FrameOptions`: `DENY`
   - `ReferrerPolicy`: `strict-origin-when-cross-origin`
   - `CustomHeadersConfig`: `Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()`
-- [ ] **Paso 2: Escribí `aplicar-cabeceras.sh <distribution-id>`.** Usa `set -euo pipefail`, es idempotente y requiere AWS CLI v2 y `jq`. Hace esto:
+- [x] **Paso 2: Escribí `aplicar-cabeceras.sh <distribution-id>`.** Usa `set -euo pipefail`, es idempotente y requiere AWS CLI v2 y `jq`. Hace esto:
   1. Busca la política por nombre con `aws cloudfront list-response-headers-policies --type custom`.
   2. Si no existe, la crea (`create-response-headers-policy`).
   3. Si existe, la actualiza con `update-response-headers-policy --id … --if-match <ETag>`.
@@ -198,16 +198,16 @@ git commit -m "Verificador de CSP y URLs absolutas del sitio"
   5. Si no, la escribe con `jq` y llama a `update-distribution --if-match <ETag>`.
   6. Al final imprime el `curl -sI` que hay que correr para verificar.
   Lo corre una persona con permisos de administración: el rol de despliegue **no** recibe permisos nuevos.
-- [ ] **Paso 3:** Corré `bash -n infra/aplicar-cabeceras.sh && jq . infra/cabeceras-seguridad.json >/dev/null && echo ok`. Esperado: `ok`.
-- [ ] **Paso 4: Verificá la CSP en local, antes de que la aplique una persona**
+- [x] **Paso 3:** Corré `bash -n infra/aplicar-cabeceras.sh && jq . infra/cabeceras-seguridad.json >/dev/null && echo ok`. Esperado: `ok`.
+- [x] **Paso 4: Verificá la CSP en local, antes de que la aplique una persona**
   1. Serví `site/` con un servidor que mande la cabecera: `python3 -c` con `http.server.SimpleHTTPRequestHandler` y `end_headers` sobrescrito para agregar `Content-Security-Policy` con el valor del Paso 1, sin `upgrade-insecure-requests` (en `http://localhost` no aplica).
   2. Abrí `http://localhost:<puerto>/` y `/no-existe` en un navegador, y la 404 servida directamente en `/404.html`.
   3. Esperado: consola sin violaciones de CSP, fuentes Oswald/Barlow cargadas y textura de grano visible.
-- [ ] **Paso 5:** En `infra/README.md`, documentá:
+- [x] **Paso 5:** En `infra/README.md`, documentá:
   - qué hace cada cabecera;
   - por qué `style-src` no lleva `'unsafe-inline'` (el HTML no tiene `style="…"` y `verificar_seguridad.py` lo vigila);
   - que si se agrega un tercero (analytics, un iframe) hay que ampliar la CSP aquí.
-- [ ] **Paso 6: Commit:** `git add infra && git commit -m "Cabeceras de seguridad para CloudFront"`
+- [x] **Paso 6: Commit:** `git add infra && git commit -m "Cabeceras de seguridad para CloudFront"`
 
 ### Tarea 5: Configuración de GitHub con `gh`
 

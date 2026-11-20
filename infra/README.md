@@ -1,5 +1,19 @@
 # Rol de IAM para GitHub Actions (OIDC)
 
+## Cabeceras de seguridad
+
+`cabeceras-seguridad.json` define una política de CloudFront que restringe scripts, estilos, fuentes e imágenes con CSP; fuerza HTTPS con HSTS; bloquea la detección incorrecta de tipos, los iframes y limita el envío del referer. `Permissions-Policy` desactiva cámara, micrófono, geolocalización, pagos y USB. Los valores reemplazan los que entregue el origen.
+
+`style-src` no incluye `'unsafe-inline'`: el HTML no usa atributos `style="…"` y `.github/scripts/verificar_seguridad.py` lo vigila junto con handlers y scripts en línea.
+
+Para crear o actualizar la política y asociarla a la distribución:
+
+```bash
+./aplicar-cabeceras.sh <distribution-id>
+```
+
+Requiere AWS CLI v2, `jq` y permisos de administración de CloudFront. Si se agrega un servicio de terceros, como analytics o un iframe, ampliá la CSP en `cabeceras-seguridad.json` y verificá el sitio antes de aplicarla.
+
 Estos archivos crean el rol que GitHub Actions asume para publicar el sitio. **No hay llaves de acceso**: GitHub emite un token de identidad de corta vida y AWS lo cambia por credenciales temporales.
 
 | Archivo | Qué es |
