@@ -45,4 +45,4 @@ Single workflow `.github/workflows/deploy.yml`: `verificar → dev → prod`. Pu
 
 ## Domain-dependent values
 
-The site assumes `rockers502.gt`. Changing the domain means updating `canonical`, Open Graph tags, JSON-LD in `index.html`, `sitemap.xml` and `robots.txt`.
+The site is published at `rockers.fjbatresv.com`. If the domain changes, update `SITIO` in `.github/scripts/verificar_seguridad.py` and run the verifier; it lists every file that needs updating.

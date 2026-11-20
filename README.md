@@ -280,7 +280,7 @@ Objetivos que el sitio cumple y conviene verificar tras el despliegue:
 
 ## Pendientes antes de salir a producción
 
-1. **Confirmar el dominio.** Todo apunta a `rockers502.gt`; si se elige otro, hay que actualizar `canonical`, Open Graph, `sitemap.xml`, `robots.txt` y el JSON-LD de `index.html`.
+1. El dominio es `rockers.fjbatresv.com`; si cambia, actualizá `SITIO` en `verificar_seguridad.py` y corré el verificador: te lista cada archivo a tocar.
 2. **Validar los ocho estilos de moto** y sus descripciones con la mesa directiva. El requisito publicado en 2021 nombra solo cuatro; el sitio ya lo redacta ampliado.
 3. **Pies de foto del carrusel.** Hoy son descriptivos genéricos; reemplazarlos por lugar y fecha reales.
 4. **Derechos de imagen.** Hay caras reconocibles en las fotos de rodadas. Conviene el visto bueno de quienes aparecen.

@@ -103,14 +103,14 @@ git commit -m "Verificador de CSP y URLs absolutas del sitio"
 **Interfaces:**
 - Consumes: `verificar_seguridad.py` (Tarea 1).
 
-- [ ] **Paso 1:** Reemplazá `https://www.rockers502.gt/` por `https://rockers.fjbatresv.com/` en `site/`. Los `@id` del JSON-LD quedan `https://rockers.fjbatresv.com/#sitio` y `…/#club`.
-- [ ] **Paso 2:** Cambios en `deploy.sh`:
+- [x] **Paso 1:** Reemplazá `https://www.rockers502.gt/` por `https://rockers.fjbatresv.com/` en `site/`. Los `@id` del JSON-LD quedan `https://rockers.fjbatresv.com/#sitio` y `…/#club`.
+- [x] **Paso 2:** Cambios en `deploy.sh`:
   - `ROCKERS_BUCKET` y `ROCKERS_DISTRIBUTION_ID` pasan a ser **obligatorias**: si faltan, sale con un mensaje claro (`: "${ROCKERS_BUCKET:?Definí ROCKERS_BUCKET}"`). Se quitan los valores por defecto `rockers502-gt-site` y `E000000000000`.
   - El mensaje final pasa a `https://rockers.fjbatresv.com/`.
-- [ ] **Paso 3:** En `CLAUDE.md`, la sección "Domain-dependent values" pasa a nombrar `rockers.fjbatresv.com` y el verificador. En `README.md`, el punto 1 de "Pendientes" se reemplaza por: "El dominio es `rockers.fjbatresv.com`; si cambia, actualizá `SITIO` en `verificar_seguridad.py` y corré el verificador: te lista cada archivo a tocar."
-- [ ] **Paso 4:** Corré `python3 .github/scripts/verificar_seguridad.py && python3 .github/scripts/verificar_enlaces.py`. Las dos salidas tienen que ser exitosas.
-- [ ] **Paso 5:** Corré `grep -rn "rockers502.gt" site deploy.sh CLAUDE.md`. No tiene que devolver nada.
-- [ ] **Paso 6: Commit:** `git commit -am "Publicar el sitio en rockers.fjbatresv.com"`
+- [x] **Paso 3:** En `CLAUDE.md`, la sección "Domain-dependent values" pasa a nombrar `rockers.fjbatresv.com` y el verificador. En `README.md`, el punto 1 de "Pendientes" se reemplaza por: "El dominio es `rockers.fjbatresv.com`; si cambia, actualizá `SITIO` en `verificar_seguridad.py` y corré el verificador: te lista cada archivo a tocar."
+- [x] **Paso 4:** Corré `python3 .github/scripts/verificar_seguridad.py && python3 .github/scripts/verificar_enlaces.py`. Las dos salidas tienen que ser exitosas.
+- [x] **Paso 5:** Corré `grep -rn "rockers502.gt" site deploy.sh CLAUDE.md`. No tiene que devolver nada.
+- [x] **Paso 6: Commit:** `git commit -am "Publicar el sitio en rockers.fjbatresv.com"`
 
 ### Tarea 3: Workflow de un solo despliegue, endurecido
 

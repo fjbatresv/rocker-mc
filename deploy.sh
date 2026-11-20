@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Despliegue de rockers502.gt a S3 + CloudFront.
+# Despliegue de rockers.fjbatresv.com a S3 + CloudFront.
 #
 #   ./deploy.sh
 #
@@ -10,8 +10,10 @@
 #
 set -euo pipefail
 
-BUCKET="${ROCKERS_BUCKET:-rockers502-gt-site}"
-DISTRIBUTION_ID="${ROCKERS_DISTRIBUTION_ID:-E000000000000}"
+: "${ROCKERS_BUCKET:?Definí ROCKERS_BUCKET}"
+: "${ROCKERS_DISTRIBUTION_ID:?Definí ROCKERS_DISTRIBUTION_ID}"
+BUCKET="$ROCKERS_BUCKET"
+DISTRIBUTION_ID="$ROCKERS_DISTRIBUTION_ID"
 PROFILE="${AWS_PROFILE:-default}"
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/site"
 
@@ -60,4 +62,4 @@ aws cloudfront wait invalidation-completed \
   --distribution-id "$DISTRIBUTION_ID" \
   --id "$INVALIDATION_ID"
 
-echo "==> Listo: https://www.rockers502.gt/"
+echo "==> Listo: https://rockers.fjbatresv.com/"
