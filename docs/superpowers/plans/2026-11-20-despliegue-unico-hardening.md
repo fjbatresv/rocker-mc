@@ -58,7 +58,7 @@
   - `problemas_enlaces_externos(html: str, pagina: str) -> list[str]`: todo `<a … target="_blank">` debe llevar `rel` con `noopener`.
   - CLI: `python3 .github/scripts/verificar_seguridad.py [--sitio URL]`, que usa `SITIO` por defecto, revisa `site/index.html` y `site/404.html`, imprime los problemas y sale con 1 si hay alguno. Si no hay, imprime `Seguridad y URLs: sin problemas.` y sale con 0. Mismo estilo que `verificar_enlaces.py`.
 
-- [ ] **Paso 1: Escribí los tests (`unittest`, con carpetas temporales de `tempfile`).** Escribí `test_sitio_con_y_sin_barra`, `test_scripts`, `test_style_en_linea`, `test_robots_bloqueado`, `test_dominio_viejo`, `test_canonical_en_404` y `test_target_blank_sin_noopener`. Estas son las aserciones concretas:
+- [x] **Paso 1: Escribí los tests (`unittest`, con carpetas temporales de `tempfile`).** Escribí `test_sitio_con_y_sin_barra`, `test_scripts`, `test_style_en_linea`, `test_robots_bloqueado`, `test_dominio_viejo`, `test_canonical_en_404` y `test_target_blank_sin_noopener`. Estas son las aserciones concretas:
 
 ```python
 def test_sitio_con_y_sin_barra(self):
@@ -82,11 +82,11 @@ def test_canonical_en_404(self):            # 404.html con rel="canonical" → a
 def test_target_blank_sin_noopener(self):   # <a target="_blank" href="https://x"> → 1 problema
 ```
 
-- [ ] **Paso 2:** Corré `python3 -m unittest discover -s .github/scripts -p 'test_*.py' -v`. Tiene que fallar con `ModuleNotFoundError: verificar_seguridad`.
-- [ ] **Paso 3:** Implementá `verificar_seguridad.py` con las firmas de arriba, usando `re` sobre el texto (igual que `verificar_enlaces.py`; no hace falta un parser de HTML). Para "Disallow: /" como regla completa, buscá la línea con `^Disallow:\s*/\s*$` en modo multilínea.
-- [ ] **Paso 4:** Corré otra vez los tests. Tienen que pasar los 7.
-- [ ] **Paso 5:** Corré `python3 .github/scripts/verificar_seguridad.py`. **Tiene que fallar** y listar los `rockers502.gt` de `site/`; es lo que arregla la Tarea 2.
-- [ ] **Paso 6: Commit**
+- [x] **Paso 2:** Corré `python3 -m unittest discover -s .github/scripts -p 'test_*.py' -v`. Tiene que fallar con `ModuleNotFoundError: verificar_seguridad`.
+- [x] **Paso 3:** Implementá `verificar_seguridad.py` con las firmas de arriba, usando `re` sobre el texto (igual que `verificar_enlaces.py`; no hace falta un parser de HTML). Para "Disallow: /" como regla completa, buscá la línea con `^Disallow:\s*/\s*$` en modo multilínea.
+- [x] **Paso 4:** Corré otra vez los tests. Tienen que pasar los 7.
+- [x] **Paso 5:** Corré `python3 .github/scripts/verificar_seguridad.py`. **Tiene que fallar** y listar los `rockers502.gt` de `site/`; es lo que arregla la Tarea 2.
+- [x] **Paso 6: Commit**
 
 ```bash
 git add .github/scripts/verificar_seguridad.py .github/scripts/test_verificar_seguridad.py
