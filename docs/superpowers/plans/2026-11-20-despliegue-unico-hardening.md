@@ -124,7 +124,7 @@ git commit -m "Verificador de CSP y URLs absolutas del sitio"
 - Consumes: `verificar_seguridad.py --sitio`.
 - Produces: el job con `name: Verificar el sitio` (contexto del check requerido en la Tarea 5) y el job `desplegar` con `environment: dev`.
 
-- [ ] **Paso 1: Reescribí `deploy.yml` con esta estructura**
+- [x] **Paso 1: Reescribí `deploy.yml` con esta estructura**
   - `name: Desplegar`
   - `on`:
     - `push` a `main` con `paths: ['site/**', '.github/workflows/deploy.yml', '.github/scripts/**']`.
@@ -156,21 +156,21 @@ git commit -m "Verificador de CSP y URLs absolutas del sitio"
     9. Resumen con `Indexable: true`.
   - Los secretos se pasan por `env:` (`BUCKET`, `DISTRIBUTION`) y se usan como `"$BUCKET"`.
   - **Se elimina** el step "Bloquear la indexación" y el job `prod` completo.
-- [ ] **Paso 2:** Creá `.github/dependabot.yml` con `version: 2` y un único bloque: `package-ecosystem: github-actions`, `directory: /`, `schedule.interval: weekly`, `commit-message.prefix: "Actions"`.
-- [ ] **Paso 3: Verificación estática**
+- [x] **Paso 2:** Creá `.github/dependabot.yml` con `version: 2` y un único bloque: `package-ecosystem: github-actions`, `directory: /`, `schedule.interval: weekly`, `commit-message.prefix: "Actions"`.
+- [x] **Paso 3: Verificación estática**
   - Corré `docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:latest -color` (o `actionlint` si está instalado). Esperado: sin errores.
   - Corré `grep -n 'secrets\.' .github/workflows/deploy.yml`. Esperado: solo líneas dentro de bloques `env:` o `with:`, ninguna en un `run:`.
   - Corré `grep -nE 'uses: [^@]+@v[0-9]' .github/workflows/deploy.yml`. Esperado: nada (todo fijado por SHA).
   - Corré `grep -n -A3 'pull_request:' .github/workflows/deploy.yml`. Esperado: sin `paths`.
   - Corré `grep -c 'prod' .github/workflows/deploy.yml`. Esperado: `0`.
-- [ ] **Paso 4:** En `README.md`, reescribí "Despliegue" para un solo entorno:
+- [x] **Paso 4:** En `README.md`, reescribí "Despliegue" para un solo entorno:
   - qué dispara el workflow;
   - por qué el Environment se sigue llamando `dev` (el rol de IAM);
   - las 2 variables y los 3 secretos;
   - que los PR corren solo la verificación.
   - Borrá las instrucciones de un segundo bucket/distribución, el `crear-rol.sh prod` y la tabla dev/prod.
   - Actualizá el diagrama a `push a main ──→ verificar ──→ desplegar` y `PR ──→ verificar`.
-- [ ] **Paso 5: Commit:** `git add -A .github README.md CLAUDE.md && git commit -m "Un solo despliegue a AWS, indexable y con el workflow endurecido"`
+- [x] **Paso 5: Commit:** `git add -A .github README.md CLAUDE.md && git commit -m "Un solo despliegue a AWS, indexable y con el workflow endurecido"`
 
 ### Tarea 4: Cabeceras de seguridad en CloudFront
 

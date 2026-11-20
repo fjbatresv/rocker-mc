@@ -35,10 +35,9 @@ There are no tests or linters. Manually check: the menu on desktop and mobile, t
 
 ## Deployment
 
-Single workflow `.github/workflows/deploy.yml`: `verificar → dev → prod`. Push to `main` touching `site/**` or `.github/**` deploys dev automatically, then prod waits for reviewer approval on the `prod` GitHub Environment. `workflow_dispatch` with `dev` stops after dev.
+Single workflow `.github/workflows/deploy.yml`: `verificar → desplegar` in the GitHub Environment `dev`. That name stays because the IAM role trust policy pins `sub` to `repo:fjbatresv/rocker-mc:environment:dev`; the deployed site is public and indexable. Pushes to `main` touching the site, workflow or scripts deploy; pull requests only run verification. `workflow_dispatch` deploys only when launched from `main`.
 
 - No environment-specific values in code: `AWS_REGION`, `SITE_URL` (Environment variables) and `AWS_ROLE_ARN`, `AWS_S3_BUCKET`, `AWS_CLOUDFRONT_DISTRIBUTION_ID` (Environment secrets) come from each GitHub Environment.
-- The dev job overwrites `robots.txt` with `Disallow: /` and deletes `sitemap.xml` before uploading — the committed files are the prod versions.
 - Cache policy: `assets/**` uploaded with 1-year `immutable`; HTML with `max-age=0, must-revalidate`; robots/sitemap 1 hour. Every deploy invalidates `/*`. If asset contents change, the invalidation is what refreshes them (filenames are not hashed).
 - `deploy.sh` mirrors the prod job's sync/invalidate steps; keep them in sync when changing either.
 - AWS auth is OIDC (no keys). `infra/crear-rol.sh <entorno> <bucket> <distribution-id>` creates/updates one IAM role per environment; the trust policy pins `sub` to `repo:fjbatresv/rocker-mc:environment:<entorno>` so dev can't assume the prod role. Details in `infra/README.md`.
