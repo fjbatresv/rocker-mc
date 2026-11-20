@@ -118,6 +118,7 @@ git commit -m "Verificador de CSP y URLs absolutas del sitio"
 - Modify: `.github/workflows/deploy.yml` (reescritura)
 - Create: `.github/dependabot.yml`
 - Modify: `README.md`, sección "Despliegue" (reescritura: un entorno, sin tabla dev/prod)
+- Modify: `CLAUDE.md`, sección "Deployment" (un solo job `desplegar` en el Environment `dev`, indexable; los PR solo verifican; quitar la mención a `robots.txt` reemplazado y al job `prod`)
 
 **Interfaces:**
 - Consumes: `verificar_seguridad.py --sitio`.
