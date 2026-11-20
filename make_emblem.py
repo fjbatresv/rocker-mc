@@ -76,7 +76,10 @@ def main():
     chico.save(OUT + 'emblem.webp', 'WEBP', quality=92, method=6)
 
     # Íconos
-    grande.resize((512, 512), Image.LANCZOS).save(OUT + 'favicon-512.png')
+    # Paleta de 256 colores: pasa de ~340 KB a ~50 KB sin diferencia visible.
+    (grande.resize((512, 512), Image.LANCZOS)
+        .quantize(256, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.FLOYDSTEINBERG)
+        .save(OUT + 'favicon-512.png', optimize=True))
     fondo = Image.new('RGBA', (512, 512), (10, 10, 11, 255))
     fondo.alpha_composite(grande.resize((476, 476), Image.LANCZOS), (18, 18))
     fondo.convert('RGB').resize((180, 180), Image.LANCZOS).save(OUT + 'apple-touch-icon.png')
