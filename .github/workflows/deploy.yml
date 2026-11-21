@@ -26,7 +26,7 @@ jobs:
 
       - name: Archivos críticos presentes
         run: |
-          for f in site/index.html site/404.html site/assets/css/styles.css site/assets/js/main.js; do
+          for f in site/index.html site/404.html site/assets/css/styles.css site/assets/js/main.js landing/index.html landing/en/index.html landing/404.html landing/assets/css/landing.css; do
             [ -s "$f" ] || { echo "::error::Falta o está vacío: $f"; exit 1; }
           done
 
@@ -34,10 +34,10 @@ jobs:
         run: python3 -m unittest discover -s .github/scripts -p 'test_*.py'
 
       - name: Verificar enlaces
-        run: python3 .github/scripts/verificar_enlaces.py
+        run: python3 .github/scripts/verificar_enlaces.py --destino todos
 
       - name: Verificar seguridad y URLs
-        run: python3 .github/scripts/verificar_seguridad.py
+        run: python3 .github/scripts/verificar_seguridad.py --destino todos
 
   desplegar:
     name: Desplegar en AWS
@@ -83,7 +83,7 @@ jobs:
       - name: Las URLs del sitio coinciden con SITE_URL
         env:
           SITE_URL: ${{ vars.SITE_URL }}
-        run: python3 .github/scripts/verificar_seguridad.py --sitio "$SITE_URL"
+        run: python3 .github/scripts/verificar_seguridad.py --destino site --sitio "$SITE_URL"
 
       - name: Asumir el rol de AWS
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0

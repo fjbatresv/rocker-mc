@@ -32,7 +32,7 @@ php -S localhost:8080 -t site
 
 ```
 .
-├── site/                        ← lo único que se sube al bucket
+├── site/                        ← lo que se sube al bucket de AWS
 │   ├── index.html
 │   ├── 404.html
 │   ├── favicon.ico
@@ -50,9 +50,13 @@ php -S localhost:8080 -t site
 │           ├── apple-touch-icon.png
 │           ├── rodadas/             ocho fotos del carrusel
 │           └── maquinas/            cinco fotos del mosaico de estilos
+├── landing/                     ← caso de estudio publicado en GitHub Pages
+│   ├── index.html                ← español
+│   └── en/index.html             ← inglés
 ├── .github/
-│   ├── workflows/deploy.yml     ← orquesta: dev automático, prod tras aprobación
-│   └── scripts/verificar_enlaces.py
+│   ├── workflows/deploy.yml     ← publica site/ en AWS
+│   ├── workflows/landing.yml    ← publica landing/ en GitHub Pages
+│   └── scripts/                 ← pruebas y verificadores por destino
 ├── infra/                       ← rol de IAM para el despliegue (OIDC)
 │   ├── oidc-trust-policy.json
 │   ├── deploy-policy.json
@@ -92,7 +96,7 @@ El script separa el fondo con un relleno por inundación desde los bordes en lug
 
 El workflow publica en AWS cuando hay un push a `main` que cambia `site/**`, el propio workflow o `.github/scripts/**`. `workflow_dispatch` publica solo si se ejecuta desde `main`. Los pull requests a `main` corren la verificación y no despliegan.
 
-El dominio oficial del sitio de AWS es `rockers502mc.com.gt`. `rockers.fjbatresv.com` queda reservado para la futura landing de portafolio en GitHub Pages, pendiente de otro plan. El único job de publicación usa el GitHub Environment `dev`; conserva ese nombre porque la trust policy del rol IAM está fijada a `repo:fjbatresv/rocker-mc:environment:dev`.
+El dominio oficial del sitio de AWS es `rockers502mc.com.gt`. La landing de portafolio se publica por separado en `rockers.fjbatresv.com`; sus cambios no disparan el despliegue a AWS. El job de publicación de AWS usa el GitHub Environment `dev`; conserva ese nombre porque la trust policy del rol IAM está fijada a `repo:fjbatresv/rocker-mc:environment:dev`.
 
 En **Settings → Environments → dev**, configurá estas variables y secretos:
 
@@ -120,6 +124,18 @@ export ROCKERS_DISTRIBUTION_ID=E1XXXXXXXXXXXX
 ```
 
 ---
+
+## Landing de portafolio
+
+La landing presenta el sitio de Rockers 502 MC como un caso de estudio de ingeniería. Vive en `landing/`, con español en `/` e inglés en `/en/`; GitHub Actions valida los dos idiomas y publica esa carpeta en GitHub Pages. No usa JavaScript ni build.
+
+Para previsualizarla, desde la raíz del repositorio:
+
+```bash
+cd landing && python3 -m http.server 8081
+```
+
+Abrí <http://localhost:8081>. Tras el primer despliegue, activá **Enforce HTTPS** en Settings → Pages. La landing se despliega con el workflow `Publicar la landing`; el workflow de AWS no incluye `landing/**`.
 
 ## Política de caché
 
@@ -162,7 +178,7 @@ Objetivos que el sitio cumple y conviene verificar tras el despliegue:
 
 ## Pendientes antes de salir a producción
 
-1. El dominio oficial de AWS es `rockers502mc.com.gt`; si cambia, actualizá `SITIO` en `verificar_seguridad.py` y corré el verificador: te lista cada archivo a tocar. `rockers.fjbatresv.com` está reservado para la futura landing de portafolio en GitHub Pages y queda pendiente de otro plan.
+1. El dominio oficial de AWS es `rockers502mc.com.gt`; si cambia, actualizá `SITIO` en `verificar_seguridad.py` y corré el verificador: te lista cada archivo a tocar. La landing se sirve por separado desde `rockers.fjbatresv.com`.
 2. **Validar los ocho estilos de moto** y sus descripciones con la mesa directiva. El requisito publicado en 2021 nombra solo cuatro; el sitio ya lo redacta ampliado.
 3. **Pies de foto del carrusel.** Hoy son descriptivos genéricos; reemplazarlos por lugar y fecha reales.
 4. **Derechos de imagen.** Hay caras reconocibles en las fotos de rodadas. Conviene el visto bueno de quienes aparecen.
