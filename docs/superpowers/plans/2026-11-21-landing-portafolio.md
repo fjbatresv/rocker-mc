@@ -128,11 +128,11 @@
 - Consumes: texto ES (Tarea 3), `problemas_url` con `canonicas` (Tarea 1).
 - Produces: `problemas_hreflang(raiz: str, sitio: str, canonicas) -> list[str]` en `verificar_seguridad.py`, llamado por `verificar()` cuando el destino tiene más de una canónica.
 
-- [ ] **Paso 1: Tests** `test_hreflang_reciproco` (cada página de `canonicas` declara `<link rel="alternate" hreflang="es" href=sitio+'/'>`, `hreflang="en"` → `sitio+'/en/'`, y `hreflang="x-default"` → `sitio+'/'`; si falta uno → ≥1 problema) y `test_canonical_por_pagina` (`en/index.html` con canonical `sitio+'/'` → ≥1 problema). Corré: fallan.
-- [ ] **Paso 2:** Implementá `problemas_hreflang`. Escribí `landing/en/index.html` (`lang="en"`, traducción fiel, mismos datos y enlaces, rutas relativas `../assets/…`, `mailto:` con asuntos en inglés, `og:locale` `en_US`; en ES `es_GT`). Agregá los tres `hreflang` a ambas páginas y el selector ES/EN en el encabezado (`aria-current="page"` en el idioma actual).
-- [ ] **Paso 3:** Todo verde: tests, `verificar_enlaces.py --destino todos`, `verificar_seguridad.py --destino todos`.
-- [ ] **Paso 4: Navegador** en `/en/`: consola sin violaciones de CSP, 360 px sin scroll horizontal.
-- [ ] **Paso 5: Commit:** `Versión en inglés de la landing`
+- [x] **Paso 1: Tests** `test_hreflang_reciproco` (cada página de `canonicas` declara `<link rel="alternate" hreflang="es" href=sitio+'/'>`, `hreflang="en"` → `sitio+'/en/'`, y `hreflang="x-default"` → `sitio+'/'`; si falta uno → ≥1 problema) y `test_canonical_por_pagina` (`en/index.html` con canonical `sitio+'/'` → ≥1 problema). Corré: fallan.
+- [x] **Paso 2:** Implementá `problemas_hreflang`. Escribí `landing/en/index.html` (`lang="en"`, traducción fiel, mismos datos y enlaces, rutas relativas `../assets/…`, `mailto:` con asuntos en inglés, `og:locale` `en_US`; en ES `es_GT`). Agregá los tres `hreflang` a ambas páginas y el selector ES/EN en el encabezado (`aria-current="page"` en el idioma actual).
+- [x] **Paso 3:** Todo verde: tests, `verificar_enlaces.py --destino todos`, `verificar_seguridad.py --destino todos`.
+- [x] **Paso 4: Navegador** en `/en/`: consola sin violaciones de CSP, 360 px sin scroll horizontal.
+- [x] **Paso 5: Commit:** `Versión en inglés de la landing`
 
 ### Tarea 5: CI, despliegue a Pages y documentación
 

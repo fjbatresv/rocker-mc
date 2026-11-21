@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from verificar_seguridad import DESTINOS, CSP_LANDING, problemas_csp, problemas_csp_meta, problemas_enlaces_externos, problemas_url
+from verificar_seguridad import DESTINOS, CSP_LANDING, problemas_csp, problemas_csp_meta, problemas_enlaces_externos, problemas_hreflang, problemas_url
 
 
 def sitio_valido(raiz):
@@ -91,6 +91,27 @@ class VerificarSeguridadTest(unittest.TestCase):
     def test_destinos_por_defecto(self):
         self.assertEqual(DESTINOS['site'].sitio, 'https://rockers502mc.com.gt')
         self.assertIn('rockers.fjbatresv.com', DESTINOS['site'].prohibidos)
+
+    def test_hreflang_reciproco(self):
+        raiz = Path(self.tmp.name)
+        ingles = raiz / 'en'
+        ingles.mkdir()
+        tags = ''.join(f'<link rel="alternate" hreflang="{lang}" href="{href}">' for lang, href in (('es', 'https://rockers.fjbatresv.com/'), ('en', 'https://rockers.fjbatresv.com/en/'), ('x-default', 'https://rockers.fjbatresv.com/')))
+        (raiz / 'index.html').write_text(tags, encoding='utf-8')
+        (ingles / 'index.html').write_text(tags, encoding='utf-8')
+        self.assertEqual(problemas_hreflang(str(raiz), 'https://rockers.fjbatresv.com', DESTINOS['landing'].canonicas), [])
+        (ingles / 'index.html').write_text(tags.replace('hreflang="x-default"', 'hreflang="x-extra"'), encoding='utf-8')
+        self.assertTrue(problemas_hreflang(str(raiz), 'https://rockers.fjbatresv.com', DESTINOS['landing'].canonicas))
+
+    def test_canonical_por_pagina(self):
+        raiz = Path(self.tmp.name)
+        (raiz / 'en').mkdir()
+        (raiz / 'index.html').write_text('<link rel="canonical" href="https://rockers.fjbatresv.com/"><meta property="og:url" content="https://rockers.fjbatresv.com/"><meta property="og:image" content="https://rockers.fjbatresv.com/img.jpg">', encoding='utf-8')
+        (raiz / 'en/index.html').write_text('<link rel="canonical" href="https://rockers.fjbatresv.com/"><meta property="og:url" content="https://rockers.fjbatresv.com/en/"><meta property="og:image" content="https://rockers.fjbatresv.com/img.jpg">', encoding='utf-8')
+        (raiz / '404.html').write_text('<p>404</p>', encoding='utf-8')
+        (raiz / 'sitemap.xml').write_text('<loc>https://rockers.fjbatresv.com/</loc><loc>https://rockers.fjbatresv.com/en/</loc>', encoding='utf-8')
+        (raiz / 'robots.txt').write_text('Allow: /\nSitemap: https://rockers.fjbatresv.com/sitemap.xml', encoding='utf-8')
+        self.assertTrue(problemas_url(str(raiz), 'https://rockers.fjbatresv.com', DESTINOS['landing'].canonicas, DESTINOS['landing'].prohibidos))
 
 
 if __name__ == '__main__':
