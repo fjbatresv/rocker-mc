@@ -104,18 +104,18 @@
 - Consumes: layout y `id` de secciones de la Tarea 2.
 - Produces: el texto ES final que la Tarea 4 traduce.
 
-- [ ] **Paso 1: Medí los datos** y anotalos en el reporte final con el comando y su salida:
+- [x] **Paso 1: Medí los datos** y anotalos en el reporte final con el comando y su salida:
   - Código fuente: `wc -c site/index.html site/404.html site/assets/css/styles.css site/assets/js/main.js` → total en KB (÷1024, redondeado).
   - Peso y archivos de `site/`: `du -sh site && find site -type f | wc -l`.
   - Dependencias: `ls package.json requirements.txt 2>/dev/null | wc -l` → `0`.
   - Contraste de `--rojo-txt` sobre `--negro` con la fórmula WCAG 2.x (stdlib) → `5.17:1`.
   - Favicon: `git show --stat 6fd1ff1`.
-- [ ] **Paso 2: Captura** del sitio del club (`https://rockers502mc.com.gt/`, 1440×900, solo el primer pantallazo) como `sitio-club.webp`, ≤150 KB, con `width`/`height` en el HTML y `alt` descriptivo.
-- [ ] **Paso 3: Secciones**, en el orden y con el contenido del spec (*Estructura de la página*, puntos 2 a 9): hero con franja de 3 datos medidos; "El proyecto" (miembro, voluntario, con aprobación; restricciones reales); 5 tarjetas de decisiones, cada una con porqué técnico, "qué gana quien tiene un sitio así" y enlaces de evidencia de *Global Constraints*; arquitectura; proceso con agentes de IA (incluye el caso PR #2 → PR #3 y enlace a `docs/superpowers/plans/`); stack; cierre `#contacto` con los dos bloques y sus `mailto:`; pie.
-- [ ] **Paso 4: Diagrama SVG** en línea en `#arquitectura`, con `role="img"`, `<title>` y `<desc>`. Muestra: `PR → Verificar el sitio`; `push a main → verificar → desplegar (OIDC) → S3 privado → CloudFront + cabeceras → visitante`; y aparte `landing/ → GitHub Pages → rockers.fjbatresv.com`. Responsivo: horizontal desde 768 px; en angosto, vertical (dos SVG alternados con `@media`, o uno con `viewBox` vertical; a tu criterio). Colores con tokens vía `currentColor`/clases, sin `style=""`.
-- [ ] **Paso 5:** `python3 -m unittest discover -s .github/scripts -p 'test_*.py'` y `python3 .github/scripts/verificar_enlaces.py --destino landing` (falla solo por `/en/`).
-- [ ] **Paso 6: Navegador** a 360 px y 1440 px: `document.documentElement.scrollWidth <= window.innerWidth` en ambos; diagrama legible a 360 px; navegación completa con teclado y foco visible; con `prefers-reduced-motion: reduce` no hay animaciones. Si no tenés navegador, decilo.
-- [ ] **Paso 7: Commit:** `Contenido en español de la landing`
+- [x] **Paso 2: Captura** del sitio del club (`https://rockers502mc.com.gt/`, 1440×900, solo el primer pantallazo) como `sitio-club.webp`, ≤150 KB, con `width`/`height` en el HTML y `alt` descriptivo.
+- [x] **Paso 3: Secciones**, en el orden y con el contenido del spec (*Estructura de la página*, puntos 2 a 9): hero con franja de 3 datos medidos; "El proyecto" (miembro, voluntario, con aprobación; restricciones reales); 5 tarjetas de decisiones, cada una con porqué técnico, "qué gana quien tiene un sitio así" y enlaces de evidencia de *Global Constraints*; arquitectura; proceso con agentes de IA (incluye el caso PR #2 → PR #3 y enlace a `docs/superpowers/plans/`); stack; cierre `#contacto` con los dos bloques y sus `mailto:`; pie.
+- [x] **Paso 4: Diagrama SVG** en línea en `#arquitectura`, con `role="img"`, `<title>` y `<desc>`. Muestra: `PR → Verificar el sitio`; `push a main → verificar → desplegar (OIDC) → S3 privado → CloudFront + cabeceras → visitante`; y aparte `landing/ → GitHub Pages → rockers.fjbatresv.com`. Responsivo: horizontal desde 768 px; en angosto, vertical (dos SVG alternados con `@media`, o uno con `viewBox` vertical; a tu criterio). Colores con tokens vía `currentColor`/clases, sin `style=""`.
+- [x] **Paso 5:** `python3 -m unittest discover -s .github/scripts -p 'test_*.py'` y `python3 .github/scripts/verificar_enlaces.py --destino landing` (falla solo por `/en/`).
+- [x] **Paso 6: Navegador** a 360 px y 1440 px: `document.documentElement.scrollWidth <= window.innerWidth` en ambos; diagrama legible a 360 px; navegación completa con teclado y foco visible; con `prefers-reduced-motion: reduce` no hay animaciones. Si no tenés navegador, decilo.
+- [x] **Paso 7: Commit:** `Contenido en español de la landing`
 
 ### Tarea 4: Versión en inglés
 
