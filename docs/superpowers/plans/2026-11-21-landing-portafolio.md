@@ -64,18 +64,18 @@
   - `rotos(pagina: str, raiz: str) -> tuple[int, list[str]]`: (revisados, faltantes). Una ruta que empieza con `/` se resuelve desde `raiz`; una relativa, desde la carpeta de la página. Una ruta que resuelve fuera de `raiz` cuenta como faltante.
   - CLI: `verificar_enlaces.py [--destino site|landing|todos]`, default `site`. Misma salida que hoy.
 
-- [ ] **Paso 1: Tests nuevos (que fallen)**
+- [x] **Paso 1: Tests nuevos (que fallen)**
   - En `test_verificar_seguridad.py` agregá:
     - `test_landing_dos_locs`: una raíz con `index.html` (canonical `…/`), `en/index.html` (canonical `…/en/`), sitemap con los dos `<loc>` → `problemas_url(raiz, 'https://rockers.fjbatresv.com', canonicas=DESTINOS['landing'].canonicas, prohibidos=DESTINOS['landing'].prohibidos) == []`. Con un solo `<loc>` → ≥1 problema.
     - `test_landing_puede_enlazar_al_club`: un `href="https://rockers502mc.com.gt/"` en la landing → 0 problemas.
     - `test_csp_meta`: con el `<meta>` exacto → `[]`; sin `<meta>` → 1; con `'unsafe-inline'` agregado → 1.
     - `test_destinos_por_defecto`: `DESTINOS['site'].sitio == 'https://rockers502mc.com.gt'` y `'rockers.fjbatresv.com' in DESTINOS['site'].prohibidos`.
   - Creá `test_verificar_enlaces.py` con `test_ruta_relativa_desde_subcarpeta` (`en/index.html` con `../assets/a.css` existente → 0 faltantes), `test_ruta_absoluta_desde_raiz` (`/assets/a.css` → 0) y `test_ruta_que_escapa_de_la_raiz` (`../../x` → 1 faltante).
-- [ ] **Paso 2:** `python3 -m unittest discover -s .github/scripts -p 'test_*.py' -v` → fallan solo los nuevos.
-- [ ] **Paso 3:** Implementá las interfaces de arriba. No cambies las aserciones de los 9 tests existentes.
-- [ ] **Paso 4:** Corré los tests (todos pasan), `python3 .github/scripts/verificar_seguridad.py` y `python3 .github/scripts/verificar_enlaces.py` (mismas salidas exitosas que hoy), y `python3 .github/scripts/verificar_seguridad.py --destino site --sitio https://rockers502mc.com.gt/` (sin problemas).
-- [ ] **Paso 5:** En `deploy.yml`, el step de `SITE_URL` pasa a `python3 .github/scripts/verificar_seguridad.py --destino site --sitio "$SITE_URL"`. Corré actionlint (`docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:latest`).
-- [ ] **Paso 6: Commit:** `Verificadores por destino: site y landing`
+- [x] **Paso 2:** `python3 -m unittest discover -s .github/scripts -p 'test_*.py' -v` → fallan solo los nuevos.
+- [x] **Paso 3:** Implementá las interfaces de arriba. No cambies las aserciones de los 9 tests existentes.
+- [x] **Paso 4:** Corré los tests (todos pasan), `python3 .github/scripts/verificar_seguridad.py` y `python3 .github/scripts/verificar_enlaces.py` (mismas salidas exitosas que hoy), y `python3 .github/scripts/verificar_seguridad.py --destino site --sitio https://rockers502mc.com.gt/` (sin problemas).
+- [x] **Paso 5:** En `deploy.yml`, el step de `SITE_URL` pasa a `python3 .github/scripts/verificar_seguridad.py --destino site --sitio "$SITE_URL"`. Corré actionlint (`docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:latest`).
+- [x] **Paso 6: Commit:** `Verificadores por destino: site y landing`
 
 ### Tarea 2: Esqueleto de la landing (ES)
 

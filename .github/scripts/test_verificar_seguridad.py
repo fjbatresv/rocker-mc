@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from verificar_seguridad import problemas_csp, problemas_enlaces_externos, problemas_url
+from verificar_seguridad import DESTINOS, CSP_LANDING, problemas_csp, problemas_csp_meta, problemas_enlaces_externos, problemas_url
 
 
 def sitio_valido(raiz):
@@ -62,6 +62,35 @@ class VerificarSeguridadTest(unittest.TestCase):
 
     def test_target_blank_sin_noopener(self):
         self.assertEqual(len(problemas_enlaces_externos('<a target="_blank" href="https://x">', 'x.html')), 1)
+
+    def test_landing_dos_locs(self):
+        raiz = Path(self.tmp.name)
+        (raiz / 'index.html').write_text('<link rel="canonical" href="https://rockers.fjbatresv.com/"><meta property="og:url" content="https://rockers.fjbatresv.com/"><meta property="og:image" content="https://rockers.fjbatresv.com/img.jpg">', encoding='utf-8')
+        (raiz / 'en').mkdir()
+        (raiz / 'en/index.html').write_text('<link rel="canonical" href="https://rockers.fjbatresv.com/en/"><meta property="og:url" content="https://rockers.fjbatresv.com/en/"><meta property="og:image" content="https://rockers.fjbatresv.com/img.jpg">', encoding='utf-8')
+        (raiz / '404.html').write_text('<p>404</p>', encoding='utf-8')
+        (raiz / 'robots.txt').write_text('Allow: /\nSitemap: https://rockers.fjbatresv.com/sitemap.xml\n', encoding='utf-8')
+        sitemap = '<loc>https://rockers.fjbatresv.com/</loc><loc>https://rockers.fjbatresv.com/en/</loc>'
+        (raiz / 'sitemap.xml').write_text(sitemap, encoding='utf-8')
+        args = (str(raiz), 'https://rockers.fjbatresv.com', DESTINOS['landing'].canonicas, DESTINOS['landing'].prohibidos)
+        self.assertEqual(problemas_url(*args), [])
+        (raiz / 'sitemap.xml').write_text('<loc>https://rockers.fjbatresv.com/</loc>', encoding='utf-8')
+        self.assertTrue(problemas_url(*args))
+
+    def test_landing_puede_enlazar_al_club(self):
+        raiz = Path(sitio_valido(self.tmp.name))
+        (raiz / 'index.html').write_text('<link rel="canonical" href="https://rockers502mc.com.gt/"><meta property="og:url" content="https://rockers502mc.com.gt/"><meta property="og:image" content="https://rockers502mc.com.gt/img.jpg"><a href="https://rockers502mc.com.gt/">Club</a>', encoding='utf-8')
+        self.assertEqual(problemas_url(str(raiz), 'https://rockers502mc.com.gt', prohibidos=('rockers502.gt',)), [])
+
+    def test_csp_meta(self):
+        meta = f'<meta http-equiv="Content-Security-Policy" content="{CSP_LANDING}">'
+        self.assertEqual(problemas_csp_meta(meta, 'index.html', CSP_LANDING), [])
+        self.assertEqual(len(problemas_csp_meta('', 'index.html', CSP_LANDING)), 1)
+        self.assertEqual(len(problemas_csp_meta(meta.replace("'self'", "'self' 'unsafe-inline'", 1), 'index.html', CSP_LANDING)), 1)
+
+    def test_destinos_por_defecto(self):
+        self.assertEqual(DESTINOS['site'].sitio, 'https://rockers502mc.com.gt')
+        self.assertIn('rockers.fjbatresv.com', DESTINOS['site'].prohibidos)
 
 
 if __name__ == '__main__':

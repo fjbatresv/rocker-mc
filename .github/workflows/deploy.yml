@@ -83,7 +83,7 @@ jobs:
       - name: Las URLs del sitio coinciden con SITE_URL
         env:
           SITE_URL: ${{ vars.SITE_URL }}
-        run: python3 .github/scripts/verificar_seguridad.py --sitio "$SITE_URL"
+        run: python3 .github/scripts/verificar_seguridad.py --destino site --sitio "$SITE_URL"
 
       - name: Asumir el rol de AWS
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
