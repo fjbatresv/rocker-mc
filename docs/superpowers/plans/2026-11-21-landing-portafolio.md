@@ -145,15 +145,15 @@
 - Consumes: CLIs con `--destino` (Tareas 1–4).
 - Produces: el job requerido "Verificar el sitio" cubre `landing/`; workflow `Publicar la landing`.
 
-- [ ] **Paso 1:** En el job `verificar` de `deploy.yml`, los steps de enlaces y seguridad pasan a `--destino todos`, y "Archivos críticos presentes" suma `landing/index.html landing/en/index.html landing/404.html landing/assets/css/landing.css`. El `on.push.paths` de `deploy.yml` **no** incluye `landing/**` (un cambio en la landing no debe redesplegar AWS).
-- [ ] **Paso 2:** `landing.yml`, `name: Publicar la landing`:
+- [x] **Paso 1:** En el job `verificar` de `deploy.yml`, los steps de enlaces y seguridad pasan a `--destino todos`, y "Archivos críticos presentes" suma `landing/index.html landing/en/index.html landing/404.html landing/assets/css/landing.css`. El `on.push.paths` de `deploy.yml` **no** incluye `landing/**` (un cambio en la landing no debe redesplegar AWS).
+- [x] **Paso 2:** `landing.yml`, `name: Publicar la landing`:
   - `on`: `push` a `main` con `paths: ['landing/**', '.github/workflows/landing.yml']`; `workflow_dispatch`.
   - `permissions: contents: read` en la raíz. `concurrency: { group: pages, cancel-in-progress: false }`.
   - Job `verificar` (`name: Verificar la landing`): checkout (`persist-credentials: false`), tests, `verificar_enlaces.py --destino landing`, `verificar_seguridad.py --destino landing`.
   - Job `publicar` (`name: Publicar en GitHub Pages`): `needs: verificar`; `if: github.ref == 'refs/heads/main'`; `permissions: { pages: write, id-token: write }`; `environment: { name: github-pages, url: ${{ steps.deployment.outputs.page_url }} }`; steps: checkout, `configure-pages`, `upload-pages-artifact` con `path: landing`, `deploy-pages` con `id: deployment`.
-- [ ] **Paso 3:** actionlint sin errores; `grep -nE 'uses: [^@]+@v[0-9]' .github/workflows/*.yml` vacío.
-- [ ] **Paso 4:** `README.md`: sección "Landing de portafolio" (qué es, dónde vive, cómo previsualizar con `cd landing && python3 -m http.server 8081`, cómo se publica, que "Enforce HTTPS" se activa en Settings → Pages tras el primer deploy). `CLAUDE.md`: describir `landing/`, sus restricciones (CSP en `<meta>` porque Pages no permite cabeceras, y por eso `frame-ancestors` no aplica; sin JS, rutas absolutas en la 404, relación voluntaria con el club) y los verificadores por destino.
-- [ ] **Paso 5: Commit:** `Publicar la landing en GitHub Pages`
+- [x] **Paso 3:** actionlint sin errores; `grep -nE 'uses: [^@]+@v[0-9]' .github/workflows/*.yml` vacío.
+- [x] **Paso 4:** `README.md`: sección "Landing de portafolio" (qué es, dónde vive, cómo previsualizar con `cd landing && python3 -m http.server 8081`, cómo se publica, que "Enforce HTTPS" se activa en Settings → Pages tras el primer deploy). `CLAUDE.md`: describir `landing/`, sus restricciones (CSP en `<meta>` porque Pages no permite cabeceras, y por eso `frame-ancestors` no aplica; sin JS, rutas absolutas en la 404, relación voluntaria con el club) y los verificadores por destino.
+- [x] **Paso 5: Commit:** `Publicar la landing en GitHub Pages`
 
 ## Después del merge (coordinador / Javier)
 
