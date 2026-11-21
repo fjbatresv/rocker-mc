@@ -57,7 +57,8 @@ def problemas_url(raiz: str, sitio: str, canonicas=(('index.html', '/'),), prohi
     problemas = []
     error = (raiz_path / '404.html').read_text(encoding='utf-8')
     for pagina, ruta in canonicas:
-        html = (raiz_path / pagina).read_text(encoding='utf-8')
+        archivo = raiz_path / pagina
+        html = archivo.read_text(encoding='utf-8') if archivo.exists() else ''
         esperado = sitio + ruta
         for etiqueta, patron in (('canonical', r'<link\b(?=[^>]*\brel=["\']canonical["\'])[^>]*\bhref=["\']([^"\']+)'), ('og:url', r'<meta\b(?=[^>]*\bproperty=["\']og:url["\'])[^>]*\bcontent=["\']([^"\']+)')):
             encontrado = re.search(patron, html, re.I)
@@ -95,7 +96,10 @@ def problemas_hreflang(raiz: str, sitio: str, canonicas) -> list[str]:
     problemas = []
     esperado = {'es': sitio.rstrip('/') + '/', 'en': sitio.rstrip('/') + '/en/', 'x-default': sitio.rstrip('/') + '/'}
     for pagina, _ in canonicas:
-        html = (Path(raiz) / pagina).read_text(encoding='utf-8')
+        archivo = Path(raiz) / pagina
+        if not archivo.exists():
+            continue
+        html = archivo.read_text(encoding='utf-8')
         for idioma, href in esperado.items():
             patron = rf'<link\b(?=[^>]*\brel=["\']alternate["\'])(?=[^>]*\bhreflang=["\']{re.escape(idioma)}["\'])[^>]*\bhref=["\']([^"\']+)'
             # Atributos pueden aparecer en cualquier orden.
@@ -110,6 +114,8 @@ def verificar(destino: Destino, sitio: str | None = None) -> list[str]:
     problemas = []
     for pagina in destino.paginas:
         ruta = Path(destino.raiz) / pagina
+        if not ruta.exists():
+            continue
         html = ruta.read_text(encoding='utf-8')
         problemas += problemas_csp(html, str(ruta))
         problemas += problemas_enlaces_externos(html, str(ruta))

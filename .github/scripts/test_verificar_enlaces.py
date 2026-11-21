@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from verificar_enlaces import rotos
+from verificar_enlaces import rotos, rutas_relativas
 
 
 class VerificarEnlacesTest(unittest.TestCase):
@@ -28,6 +28,10 @@ class VerificarEnlacesTest(unittest.TestCase):
         pagina = self.raiz / 'en/index.html'
         pagina.write_text('<link href="../../x">', encoding='utf-8')
         self.assertEqual(len(rotos(str(pagina), str(self.raiz))[1]), 1)
+
+    def test_404_usa_rutas_absolutas(self):
+        html = Path('landing/404.html').read_text(encoding='utf-8')
+        self.assertEqual(rutas_relativas(html), [])
 
 
 if __name__ == '__main__':
