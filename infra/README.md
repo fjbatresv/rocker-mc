@@ -40,7 +40,7 @@ El script averigua el ID de cuenta solo, crea el proveedor OIDC si no existe, cr
 
 Es idempotente: se puede volver a ejecutar para corregir la política sin borrar nada.
 
-Si tu repositorio no es el configurado por defecto, exportá `GITHUB_REPO` antes:
+Si tu repositorio no es `fjbatresv/rocker-mc`, exportá `GITHUB_REPO` antes:
 
 ```bash
 GITHUB_REPO=usuario/repo ./crear-rol.sh prod mi-bucket E1XXXX

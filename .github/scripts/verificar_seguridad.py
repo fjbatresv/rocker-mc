@@ -57,7 +57,7 @@ def problemas_url(raiz: str, sitio: str) -> list[str]:
             try:
                 with open(ruta, encoding='utf-8') as entrada:
                     contenido = entrada.read()
-                    for dominio in ('rockers502.gt', 'fjbat' + 'resv.com'):
+                    for dominio in ('rockers502.gt', 'rockers.fjbatresv.com'):
                         if dominio in contenido:
                             problemas.append(f'{ruta}: contiene un dominio no permitido: {dominio}')
             except UnicodeDecodeError:

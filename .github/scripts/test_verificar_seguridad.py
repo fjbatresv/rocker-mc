@@ -45,10 +45,15 @@ class VerificarSeguridadTest(unittest.TestCase):
         (raiz / 'extra.txt').write_text('https://rockers502.gt/', encoding='utf-8')
         self.assertTrue(problemas_url(str(raiz), 'https://rockers502mc.com.gt'))
 
-    def test_dominio_de_portafolio(self):
+    def test_subdominio_de_portafolio_bloqueado(self):
         raiz = Path(sitio_valido(self.tmp.name))
-        (raiz / 'extra.txt').write_text('https://rockers.' + 'fjbat' + 'resv.com/', encoding='utf-8')
+        (raiz / 'extra.txt').write_text('https://rockers.fjbatresv.com/', encoding='utf-8')
         self.assertTrue(problemas_url(str(raiz), 'https://rockers502mc.com.gt'))
+
+    def test_credito_personal_no_bloqueado(self):
+        raiz = Path(sitio_valido(self.tmp.name))
+        (raiz / 'extra.txt').write_text('<a href="https://fjbatresv.com">Javier Batres</a>', encoding='utf-8')
+        self.assertEqual(problemas_url(str(raiz), 'https://rockers502mc.com.gt'), [])
 
     def test_canonical_en_404(self):
         raiz = Path(sitio_valido(self.tmp.name))
