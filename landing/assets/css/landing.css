@@ -19,7 +19,6 @@ figcaption,.architecture-note{font-size:15px;color:var(--gris);margin-top:10px}
 .diagram rect{fill:#1d1b1c;stroke:#71676a;stroke-width:2}
 .diagram text{fill:var(--hueso);font:600 16px Barlow,Arial,sans-serif;text-anchor:middle}
 .diagram .flow rect{stroke:var(--rojo-txt)}
-.diagram .pages rect{stroke:#8d8a84}
 .diagram path{fill:none;stroke:var(--rojo-txt);stroke-width:3}
 .diagram marker path{fill:var(--rojo-txt);stroke:none}
 .diagram-wide{display:block}.diagram-tall{display:none}
