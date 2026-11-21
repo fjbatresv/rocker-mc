@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 import sys
 
-SITIO = 'https://rockers.fjbatresv.com'
+SITIO = 'https://rockers502mc.com.gt'
 PAGINAS = ('site/index.html', 'site/404.html')
 
 
@@ -56,8 +56,10 @@ def problemas_url(raiz: str, sitio: str) -> list[str]:
             ruta = os.path.join(carpeta, archivo)
             try:
                 with open(ruta, encoding='utf-8') as entrada:
-                    if 'rockers502.gt' in entrada.read():
-                        problemas.append(f'{ruta}: contiene el dominio anterior rockers502.gt')
+                    contenido = entrada.read()
+                    for dominio in ('rockers502.gt', 'fjbat' + 'resv.com'):
+                        if dominio in contenido:
+                            problemas.append(f'{ruta}: contiene un dominio no permitido: {dominio}')
             except UnicodeDecodeError:
                 pass
     if re.search(r'<link\b(?=[^>]*\brel=["\']canonical["\'])', error, re.I):

@@ -92,14 +92,14 @@ El script separa el fondo con un relleno por inundación desde los bordes en lug
 
 El workflow publica en AWS cuando hay un push a `main` que cambia `site/**`, el propio workflow o `.github/scripts/**`. `workflow_dispatch` publica solo si se ejecuta desde `main`. Los pull requests a `main` corren la verificación y no despliegan.
 
-El único job de publicación usa el GitHub Environment `dev`. Conserva ese nombre porque la trust policy del rol IAM está fijada a `repo:fjbatresv/rocker-mc:environment:dev`; el sitio que publica es el público e indexable.
+El dominio oficial del sitio de AWS es `rockers502mc.com.gt`. `rockers.fjbatresv.com` queda reservado para la futura landing de portafolio en GitHub Pages, pendiente de otro plan. El único job de publicación usa el GitHub Environment `dev`; conserva ese nombre porque la trust policy del rol IAM está fijada a `repo:fjbatresv/rocker-mc:environment:dev`.
 
 En **Settings → Environments → dev**, configurá estas variables y secretos:
 
 | Tipo | Nombre | Uso |
 |---|---|---|
 | Variable | `AWS_REGION` | Región de AWS |
-| Variable | `SITE_URL` | `https://rockers.fjbatresv.com` |
+| Variable | `SITE_URL` | `https://rockers502mc.com.gt` |
 | Secreto | `AWS_ROLE_ARN` | Rol asumido mediante OIDC |
 | Secreto | `AWS_S3_BUCKET` | Bucket del sitio |
 | Secreto | `AWS_CLOUDFRONT_DISTRIBUTION_ID` | Distribución que se invalida |
@@ -162,7 +162,7 @@ Objetivos que el sitio cumple y conviene verificar tras el despliegue:
 
 ## Pendientes antes de salir a producción
 
-1. El dominio es `rockers.fjbatresv.com`; si cambia, actualizá `SITIO` en `verificar_seguridad.py` y corré el verificador: te lista cada archivo a tocar.
+1. El dominio oficial de AWS es `rockers502mc.com.gt`; si cambia, actualizá `SITIO` en `verificar_seguridad.py` y corré el verificador: te lista cada archivo a tocar. `rockers.fjbatresv.com` está reservado para la futura landing de portafolio en GitHub Pages y queda pendiente de otro plan.
 2. **Validar los ocho estilos de moto** y sus descripciones con la mesa directiva. El requisito publicado en 2021 nombra solo cuatro; el sitio ya lo redacta ampliado.
 3. **Pies de foto del carrusel.** Hoy son descriptivos genéricos; reemplazarlos por lugar y fecha reales.
 4. **Derechos de imagen.** Hay caras reconocibles en las fotos de rodadas. Conviene el visto bueno de quienes aparecen.

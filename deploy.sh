@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Despliegue de rockers.fjbatresv.com a S3 + CloudFront.
+# Despliegue de rockers502mc.com.gt a S3 + CloudFront.
 #
 #   ./deploy.sh
 #
@@ -62,4 +62,4 @@ aws cloudfront wait invalidation-completed \
   --distribution-id "$DISTRIBUTION_ID" \
   --id "$INVALIDATION_ID"
 
-echo "==> Listo: https://rockers.fjbatresv.com/"
+echo "==> Listo: https://rockers502mc.com.gt/"

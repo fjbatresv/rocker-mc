@@ -2,7 +2,7 @@
 
 > **Para agentes (Codex u otro):** ejecutá el plan tarea por tarea, en orden, marcando los `- [ ]`. Si tenés las skills de superpowers, usá `superpowers:executing-plans`. Cada tarea termina en un commit propio en la rama `hardening-seo-ux`. Leé `CLAUDE.md` antes de empezar: el repo está en español (voseo) y no tiene build.
 
-**Goal:** Dejar un solo despliegue a AWS (el Environment `dev`), público e indexable en `https://rockers.fjbatresv.com/`, con el workflow, la infraestructura y la configuración de GitHub endurecidos.
+**Goal:** Dejar un solo despliegue a AWS (el Environment `dev`), público e indexable en `https://rockers502mc.com.gt/`, con el workflow, la infraestructura y la configuración de GitHub endurecidos.
 
 **Architecture:** Sitio estático en `site/` publicado a S3 + CloudFront por `.github/workflows/deploy.yml`. Se elimina el job de producción; el job que queda conserva el Environment `dev` para no tocar el rol de IAM (su trust policy fija `repo:fjbatresv/rocker-mc:environment:dev`). Un script Python nuevo verifica en CI que el HTML sea compatible con la CSP y que las URLs absolutas coincidan con `SITE_URL`. Las cabeceras de seguridad se aplican con una *response headers policy* de CloudFront definida en `infra/`.
 
@@ -12,9 +12,11 @@
 
 ## Decisiones (spec)
 
+> **Corrección (2026-11-21):** el dominio oficial del club en AWS es `rockers502mc.com.gt`. `rockers.fjbatresv.com` queda reservado para la futura landing de portafolio en GitHub Pages, que se trabajará en otro plan; la Decisión 3 y los pendientes de infraestructura de abajo reflejan el dominio corregido.
+
 1. Desde hoy hay **dos** despliegues: (a) AWS, el actual Environment `dev`; (b) una landing de portafolio en GitHub Pages, que se hace en **otra rama y otro plan** (no entra acá).
 2. El sitio de AWS es el sitio público del club: **indexable**. Se elimina el paso que reemplaza `robots.txt` y borra `sitemap.xml`.
-3. URL pública: `https://rockers.fjbatresv.com/`. Es el valor de la variable `SITE_URL` del Environment `dev` (está guardado **sin** barra final). Reemplaza a `https://www.rockers502.gt/` en todo el repo.
+3. URL pública: `https://rockers502mc.com.gt/`. Es el valor de la variable `SITE_URL` del Environment `dev` (guardado **sin** barra final). `rockers.fjbatresv.com` queda reservado para la landing de portafolio en GitHub Pages.
 4. Se aplican los cambios de configuración de GitHub con `gh`: ruleset en `main`, `dev` desplegable solo desde `main`, borrar los Environments `prod` y `produccion`.
 5. Ya está hecho en esta rama (no repetir): accesibilidad, contraste (`--rojo-txt`), carrusel, SEO on-page, favicon comprimido, HTML sin `style="…"`.
 
@@ -27,7 +29,7 @@
   - `aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0`
 - Ningún secreto se interpola con `${{ secrets.* }}` dentro de un `run:`: pasa por `env:` y se usa como `"$VAR"`.
 - La CSP es exactamente la de la Tarea 4; el HTML de `site/` no puede tener `style="…"`, handlers `on*=` ni `<script>` en línea salvo `type="application/ld+json"`.
-- `https://rockers.fjbatresv.com` es la única URL absoluta del sitio; ningún archivo de `site/` puede seguir mencionando `rockers502.gt`.
+- `https://rockers502mc.com.gt` es la única URL absoluta del sitio; ningún archivo de `site/` puede seguir mencionando `rockers502.gt` ni `fjbatresv.com`.
 
 ## Review Focus
 
@@ -252,12 +254,12 @@ gh api -X PUT repos/fjbatresv/rocker-mc/actions/permissions/selected-actions \
 
 ## Pendientes fuera del código (para la persona dueña de la cuenta de AWS)
 
-1. **DNS:** `rockers.fjbatresv.com` responde NXDOMAIN. Creá en Route 53, zona `fjbatresv.com`, registros alias **A y AAAA** hacia la distribución de CloudFront. Comprobá que la distribución tenga ese *alternate domain name* y un certificado de ACM en `us-east-1` que lo cubra.
-2. **Cabeceras:** corré `infra/aplicar-cabeceras.sh <distribution-id>`. Después corré `curl -sI https://rockers.fjbatresv.com` y verificá las seis cabeceras.
-3. **HTTPS:** la distribución debe tener `Redirect HTTP to HTTPS`. Verificalo con `curl -sI http://rockers.fjbatresv.com`, que tiene que dar `301`.
+1. **DNS:** creá en Route 53, zona `rockers502mc.com.gt`, registros alias **A y AAAA** hacia la distribución de CloudFront. Comprobá que la distribución tenga `rockers502mc.com.gt` como *alternate domain name* y un certificado de ACM en `us-east-1` que lo cubra.
+2. **Cabeceras:** corré `infra/aplicar-cabeceras.sh <distribution-id>`. Después corré `curl -sI https://rockers502mc.com.gt` y verificá las seis cabeceras.
+3. **HTTPS:** la distribución debe tener `Redirect HTTP to HTTPS`. Verificalo con `curl -sI http://rockers502mc.com.gt`, que tiene que dar `301`.
 4. **Recursos de prod que quedan huérfanos:**
    - el rol de IAM `rockers502-deploy-prod`;
    - el bucket y la distribución de prod, si se llegaron a crear.
-5. **Search Console:** el dominio `fjbatresv.com` ya está verificado por TXT. Agregá la propiedad del subdominio y enviá `https://rockers.fjbatresv.com/sitemap.xml`.
+5. **Search Console:** verificá la propiedad del dominio oficial `rockers502mc.com.gt` mediante DNS y enviá `https://rockers502mc.com.gt/sitemap.xml`.
 6. **Emblema:** `Assets/logo.jpeg` todavía dice **"MG"**. Cuando exista el arte con "MC", reemplazalo y corré `python3 make_emblem.py`.
 7. **Redes:** los enlaces a Instagram (`rockers502mggt`) y TikTok (`rockers.mg.guate`) conservan "mg" en el usuario. Confirmá si las cuentas se renombraron.

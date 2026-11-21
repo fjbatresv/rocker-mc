@@ -32,4 +32,4 @@ if [ "$(jq -r '.DistributionConfig.DefaultCacheBehavior.ResponseHeadersPolicyId 
 fi
 jq --arg id "$policy_id" '.DistributionConfig | .DefaultCacheBehavior.ResponseHeadersPolicyId = $id' "$tmp/distribution.json" > "$tmp/config.json"
 aws cloudfront update-distribution --id "$distribution" --if-match "$etag" --distribution-config "file://$tmp/config.json" >/dev/null
-echo "Política asociada. Verificá con: curl -sI https://rockers.fjbatresv.com/"
+echo "Política asociada. Verificá con: curl -sI https://rockers502mc.com.gt/"

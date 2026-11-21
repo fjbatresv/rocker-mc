@@ -44,4 +44,4 @@ Single workflow `.github/workflows/deploy.yml`: `verificar → desplegar` in the
 
 ## Domain-dependent values
 
-The site is published at `rockers.fjbatresv.com`. If the domain changes, update `SITIO` in `.github/scripts/verificar_seguridad.py` and run the verifier; it lists every file that needs updating.
+The official AWS site is `rockers502mc.com.gt`; `SITE_URL` in the `dev` Environment must be `https://rockers502mc.com.gt`. `rockers.fjbatresv.com` is reserved for the future portfolio landing page on GitHub Pages, pending a separate plan. If the AWS domain changes, update `SITIO` in `.github/scripts/verificar_seguridad.py` and run the verifier; it lists every file that needs updating.

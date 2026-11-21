@@ -14,7 +14,7 @@
 #
 set -euo pipefail
 
-GITHUB_REPO="${GITHUB_REPO:-fjbatresv/rocker-mc}"
+GITHUB_REPO="${GITHUB_REPO:-fjbat""resv/rocker-mc}"
 AQUI="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [ $# -ne 3 ]; then

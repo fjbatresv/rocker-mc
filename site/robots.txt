@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://rockers.fjbatresv.com/sitemap.xml
+Sitemap: https://rockers502mc.com.gt/sitemap.xml
