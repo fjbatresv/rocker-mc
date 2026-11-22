@@ -246,7 +246,7 @@ gh api -X PUT repos/fjbatresv/rocker-mc/actions/permissions/selected-actions \
   -F github_owned_allowed=true -F verified_allowed=false -f 'patterns_allowed[]=aws-actions/*'
 ```
 
-- [ ] **Paso 5: Verificación**
+- [x] **Paso 5: Verificación**
   - `gh api repos/fjbatresv/rocker-mc/environments --jq '[.environments[].name]'` → `["dev", "github-pages"]` (`github-pages` se conserva para la landing).
   - `gh api repos/fjbatresv/rocker-mc/rulesets --jq '.[].name'` → `main protegida`
   - Abrí el mismo PR de `README.md` del Paso 6: el check "Verificar el sitio" corre y el job "Desplegar en AWS" aparece como *skipped*.
