@@ -217,7 +217,7 @@ Se ejecuta **después** de que el PR de esta rama esté fusionado en `main` y el
 
 **Files:** ninguno del repo, salvo `README.md` (Paso 6).
 
-- [ ] **Paso 1:** Limitá `dev` a la rama `main`:
+- [x] **Paso 1:** Limitá `dev` a la rama `main`:
 
 ```bash
 gh api -X PUT repos/fjbatresv/rocker-mc/environments/dev \
@@ -225,8 +225,8 @@ gh api -X PUT repos/fjbatresv/rocker-mc/environments/dev \
 gh api -X POST repos/fjbatresv/rocker-mc/environments/dev/deployment-branch-policies -f name=main -f type=branch
 ```
 
-- [ ] **Paso 2:** Borrá los Environments que sobran: `gh api -X DELETE repos/fjbatresv/rocker-mc/environments/prod` y lo mismo con `produccion`.
-- [ ] **Paso 3:** Creá el ruleset de `main` con `gh api -X POST repos/fjbatresv/rocker-mc/rulesets --input -` y este JSON:
+- [x] **Paso 2:** Saltado: los Environments `prod` y `produccion` ya no existen; se conserva `github-pages`.
+- [x] **Paso 3:** Creá el ruleset de `main` con `gh api -X POST repos/fjbatresv/rocker-mc/rulesets --input -` y este JSON:
   - `name: "main protegida"`, `target: branch`, `enforcement: active`;
   - `conditions.ref_name.include: ["~DEFAULT_BRANCH"]`;
   - reglas:
@@ -235,7 +235,7 @@ gh api -X POST repos/fjbatresv/rocker-mc/environments/dev/deployment-branch-poli
     - `pull_request` con `required_approving_review_count: 0`;
     - `required_status_checks` con el contexto `"Verificar el sitio"` y `strict_required_status_checks_policy: false`.
   - Sin `bypass_actors`.
-- [ ] **Paso 4: Repo y Actions**
+- [x] **Paso 4: Repo y Actions**
 
 ```bash
 gh repo edit fjbatresv/rocker-mc --delete-branch-on-merge
@@ -246,11 +246,11 @@ gh api -X PUT repos/fjbatresv/rocker-mc/actions/permissions/selected-actions \
   -F github_owned_allowed=true -F verified_allowed=false -f 'patterns_allowed[]=aws-actions/*'
 ```
 
-- [ ] **Paso 5: Verificación**
-  - `gh api repos/fjbatresv/rocker-mc/environments --jq '[.environments[].name]'` → `["dev"]`
+- [x] **Paso 5: Verificación**
+  - `gh api repos/fjbatresv/rocker-mc/environments --jq '[.environments[].name]'` → `["dev", "github-pages"]` (`github-pages` se conserva para la landing).
   - `gh api repos/fjbatresv/rocker-mc/rulesets --jq '.[].name'` → `main protegida`
-  - Abrí un PR de prueba que solo toque `README.md`: el check "Verificar el sitio" corre y el job "Desplegar en AWS" aparece como *skipped*.
-- [ ] **Paso 6:** En `README.md`, agregá una sección corta "Protecciones del repositorio" con lo aplicado. Hacé commit en una rama nueva con PR, porque `main` ya no acepta push directo.
+  - Abrí el mismo PR de `README.md` del Paso 6: el check "Verificar el sitio" corre y el job "Desplegar en AWS" aparece como *skipped*.
+- [x] **Paso 6:** En `README.md`, agregá una sección corta "Protecciones del repositorio" con lo aplicado. Hacé commit en una rama nueva con PR, porque `main` ya no acepta push directo.
 
 ## Pendientes fuera del código (para la persona dueña de la cuenta de AWS)
 

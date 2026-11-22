@@ -164,6 +164,14 @@ El entorno de dev agrega un bucket y una distribución más, ambos con tráfico 
 
 ---
 
+## Protecciones del repositorio
+
+El ruleset **main protegida** requiere que los cambios lleguen por un pull request y que pase el check **Verificar el sitio**. También bloquea la eliminación de `main` y los force-push; no exige aprobaciones y no tiene actores de bypass.
+
+El Environment `dev` solo permite despliegues desde `main`. GitHub Actions está limitado a Actions seleccionadas: las publicadas por GitHub y `aws-actions/*`; esto incluye `actions/checkout`, `actions/configure-pages`, `actions/upload-pages-artifact` y `actions/deploy-pages`. La fijación por SHA es obligatoria.
+
+Secret scanning y su push protection están activos. Las ramas se eliminan automáticamente después de fusionar un pull request. El Environment `github-pages` sigue separado para publicar la landing.
+
 ## Rendimiento y accesibilidad
 
 Objetivos que el sitio cumple y conviene verificar tras el despliegue:
